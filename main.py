@@ -1,11 +1,22 @@
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
+import os
 
-# تعيين متغيرات البوت
-API_ID = "YOUR_API_ID"
-API_HASH = "YOUR_API_HASH"
-BOT_TOKEN = "YOUR_BOT_TOKEN"
-ADMIN_USER_ID = 7670571581  # تم تحديث ID الأدمن
+# قراءة متغيرات البيئة
+API_ID = os.getenv("API_ID")
+API_HASH = os.getenv("API_HASH")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+ADMIN_USER_ID = 7670571581  # تأكد من تحديثه بمعرف الأدمن الصحيح
+
+# التحقق من أن المتغيرات موجودة
+if not all([API_ID, API_HASH, BOT_TOKEN]):
+    raise ValueError("تأكد من تعيين API_ID و API_HASH و BOT_TOKEN في متغيرات البيئة")
+
+# تحويل API_ID إلى int
+API_ID = int(API_ID)
+
+# إنشاء العميل
+bot = Client("payment_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
 bot = Client("payment_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
