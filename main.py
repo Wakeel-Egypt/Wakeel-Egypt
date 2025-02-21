@@ -2,8 +2,8 @@ from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
 
 # تعيين متغيرات البوت
-API_ID = "YOUR_API_ID"
-API_HASH = "YOUR_API_HASH"
+API_ID = "20267178"
+API_HASH = "5d0d025e0b607f4f51d76e764846040f"
 BOT_TOKEN = "8155646143:AAGK22ulfCKrlRDqCFwk2h5mS76gKCgIK5c"
 ADMIN_USER_ID = 7670571581  # تم تحديث ID الأدمن
 
