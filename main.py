@@ -82,12 +82,12 @@ def handle_text(client, message):
     # التعامل مع المدخلات من المستخدم
     step = user_data[chat_id]["step"]
     
-    if step == 2:  # إدخال الID
+    if step == 1:  # إدخال الID
         if not message.text.isdigit():
             message.reply("رقم الحساب خطأ. يرجى إدخال ID الحساب كرقم.")
             return
         user_data[chat_id]["id"] = message.text
-        user_data[chat_id]["step"] = 3
+        user_data[chat_id]["step"] = 2
         message.reply("برجاء اختيار طريقة الدفع.")
         
         payment_keyboard = InlineKeyboardMarkup([
@@ -96,6 +96,16 @@ def handle_text(client, message):
         ])
         message.reply("برجاء اختيار طريقة الدفع:", reply_markup=payment_keyboard)
         
+    elif step == 2:  # اختيار طريقة الدفع
+        if message.text.lower() in ['محفظة إلكترونية', 'إنستاباي']:
+            payment_method = "wallet" if "محفظة إلكترونية" in message.text else "instapay"
+            user_data[chat_id]["payment_method"] = payment_method
+            user_data[chat_id]["step"] = 3
+            message.reply(f"أكتب المبلغ المراد {'إيداعه' if user_data[chat_id]['transaction_type'] == 'deposit' else 'سحبه'}.")
+
+        else:
+            message.reply("يرجى اختيار طريقة الدفع (محفظة إلكترونية أو إنستاباي).")
+
     elif step == 3:  # إدخال المبلغ
         if not message.text.isdigit():
             message.reply("يرجى إدخال مبلغ صحيح (رقم فقط).")
