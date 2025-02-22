@@ -3,10 +3,10 @@ from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 # تعيين متغيرات البوت
-API_ID = "20267178"
-API_HASH = "5d0d025e0b607f4f51d76e764846040f"
-BOT_TOKEN = "8155646143:AAGK22ulfCKrlRDqCFwk2h5mS76gKCgIK5c"
-ADMIN_USER_ID = 7670571581  # تم تحديث ID الأدمن
+API_ID = "27419379"
+API_HASH = "39b97aa14d878fae22bee2c3542ba9f6"
+BOT_TOKEN = "7167239069:AAF-UavXSqhgu8im1Hxybf-UL5JM6IZK2aE"
+ADMIN_USER_ID = 6417778046  # تم تحديث ID الأدمن
 
 bot = Client("payment_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
