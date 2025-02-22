@@ -18,7 +18,8 @@ def start(client, message):
     user_data[message.chat.id] = {"step": 0}  # بداية من الخطوة الأولى
     keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton(" إيداع ", callback_data="deposit")],
-        [InlineKeyboardButton(" سحب ", callback_data="withdraw")]
+        [InlineKeyboardButton(" سحب ", callback_data="withdraw")],
+        [InlineKeyboardButton(" تنزيل البرامج ", callback_data="download_apps")]
     ])
     message.reply("مرحبا بك في Wakeel Egypt. وكيلك الإلكتروني الأول في مصر. ما الخدمة التي تريدها ؟\n\n",
                   reply_markup=keyboard)
@@ -38,6 +39,29 @@ def handle_callback(client, callback_query):
         ])
         callback_query.message.reply("برجاء اختيار البرنامج :", reply_markup=keyboard)
 
+    elif data == "download_apps":
+        # إضافة أزرار البرامج التي يمكن تنزيلها
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("1xBet", callback_data="download_1xbet")],
+            [InlineKeyboardButton("Melbet", callback_data="download_melbet")],
+            [InlineKeyboardButton("Linebet", callback_data="download_linebet")],
+            [InlineKeyboardButton("888StarZ", callback_data="download_888starz")],
+            [InlineKeyboardButton("Megapari", callback_data="download_megapari")]
+        ])
+        callback_query.message.reply("اختيار البرنامج الذي تريد تنزيله:", reply_markup=keyboard)
+
+    elif data == "download_1xbet":
+        callback_query.message.reply("رابط تحميل 1xBet: [رابط 1xBet](https://www.example.com/1xbet)")
+    elif data == "download_melbet":
+        callback_query.message.reply("رابط تحميل Melbet: [رابط Melbet](https://www.example.com/melbet)")
+    elif data == "download_linebet":
+        callback_query.message.reply("رابط تحميل Linebet: [رابط Linebet](https://www.example.com/linebet)")
+    elif data == "download_888starz":
+        callback_query.message.reply("رابط تحميل 888StarZ: [رابط 888StarZ](https://www.example.com/888starz)")
+    elif data == "download_megapari":
+        callback_query.message.reply("رابط تحميل Megapari: [رابط Megapari](https://www.example.com/megapari)")
+
+    # باقي العمليات للـ deposit و withdraw
     elif data in ["1xbet", "melbet", "linebet"]:
         user_data[chat_id]["platform"] = data
         user_data[chat_id]["step"] = 2  # تحديد أن العميل في خطوة إدخال الID
@@ -145,15 +169,10 @@ def handle_photo(client, message):
         # إيقاف التفاعل مع العميل بعد إرسال طلبه
         message.reply("تم إرسال طلبك بنجاح. سيتم متابعة المعاملة.")
 
-        # إضافة زر "طلب إيداع / سحب جديد"
-        keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton(" طلب إيداع / سحب جديد ", callback_data="restart")]
-        ])
-        message.reply("اضغط على الزر لإعادة البدء.", reply_markup=keyboard)
-
         # تعيين حالة العميل إلى "تم الإرسال"
         user_data[chat_id]["step"] = 0  # إيقاف إرسال أي رسائل أخرى
     
+    # إذا كانت الصورة خاصة بالسحب، يتم إرسال جميع البيانات للأدمن
     elif user_data[chat_id].get("transaction_type") == "withdraw":
         # إرسال البيانات إلى الأدمن بعد وصول الصورة
         user_info = f"طلب سحب جديد:\nالعملية: {user_data[chat_id]['transaction_type']}\nالبرنامج: {user_data[chat_id]['platform']}\nID الحساب: {user_data[chat_id]['id']}\nطريقة الدفع: {user_data[chat_id]['payment_method']}\nالمبلغ: {user_data[chat_id]['amount']}"
@@ -169,21 +188,11 @@ def handle_photo(client, message):
         bot.send_photo(ADMIN_USER_ID, message.photo.file_id)
 
         # إيقاف التفاعل مع العميل بعد إرسال طلبه
-        message.reply("تم إرسال طلبك بنجاح. سيتم متابعة المعاملة.")
-
-        # إضافة زر "طلب إيداع / سحب جديد"
-        keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton(" طلب إيداع / سحب جديد ", callback_data="restart")]
-        ])
-        message.reply("اضغط على الزر لإعادة البدء.", reply_markup=keyboard)
+        message.reply("تم إرسال طلبك بنجاح. سيتم متابعة المعاملة .")
 
         # تعيين حالة العميل إلى "تم الإرسال"
         user_data[chat_id]["step"] = 0  # إيقاف إرسال أي رسائل أخرى
 
 
-@bot.on_callback_query()
-def restart_bot(client, callback_query):
-    chat_id = callback_query.message.chat.id
-    if callback_query.data == "restart":
-      
+bot.run()
 
