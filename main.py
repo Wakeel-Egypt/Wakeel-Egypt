@@ -144,7 +144,7 @@ def handle_photo(client, message):
 
         # إضافة زر "طلب إيداع / سحب جديد"
         new_request_keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("طلب إيداع / سحب جديد", callback_data="start_new")]
+            [InlineKeyboardButton("طلب إيداع / سحب جديد", callback_data="new_request")]
         ])
         message.reply("تم إرسال طلبك بنجاح. سيتم متابعة المعاملة.", reply_markup=new_request_keyboard)
 
@@ -168,28 +168,5 @@ def handle_photo(client, message):
 
         # إضافة زر "طلب إيداع / سحب جديد"
         new_request_keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("طلب إيداع / سحب جديد", callback_data="start_new")]
-        ])
-        message.reply("تم إرسال طلبك بنجاح. سيتم متابعة المعاملة.", reply_markup=new_request_keyboard)
-
-        # تعيين حالة العميل إلى "تم الإرسال"
-        user_data[chat_id]["step"] = 0  # إيقاف إرسال أي رسائل أخرى
-
-
-@bot.on_callback_query()
-def handle_new_request(client, callback_query):
-    chat_id = callback_query.message.chat.id
-    data = callback_query.data
-
-    # إعادة بدء البوت كأن العميل ضغط /start
-    if data == "start_new":
-        user_data[chat_id] = {"step": 0}  # إعادة الخطوات إلى البداية
-        keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton(" إيداع ", callback_data="deposit")],
-            [InlineKeyboardButton(" سحب ", callback_data="withdraw")]
-        ])
-        callback_query.message.reply("مرحبا بك في Wakeel Egypt. وكيلك الإلكتروني الأول في مصر. ما الخدمة التي تريدها ؟\n\n",
-                                      reply_markup=keyboard)
-
-bot.run()
+            [InlineKeyboardButton("طلب إيداع / سحب جديد
 
