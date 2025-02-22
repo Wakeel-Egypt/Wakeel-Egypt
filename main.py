@@ -46,7 +46,7 @@ def handle_callback(client, callback_query):
     elif data in ["wallet", "instapay"]:
         user_data[chat_id]["payment_method"] = data
         user_data[chat_id]["step"] = 3  # تحديد أن العميل في خطوة إدخال المبلغ
-        callback_query.message.reply("أدخل المبلغ .")
+        callback_query.message.reply(" أدخل المبلغ المراد إيداعه/سحبه .")
     
     # الرجوع إلى الخطوة السابقة
     elif data == "back":
@@ -87,13 +87,12 @@ def handle_text(client, message):
             return
         user_data[chat_id]["id"] = message.text
         user_data[chat_id]["step"] = 3
-        message.reply("برجاء اختيار طريقة الدفع.")
         
         payment_keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton(" محفظة إلكترونية ", callback_data="wallet")],
             [InlineKeyboardButton(" إنستاباي ", callback_data="instapay")]
         ])
-        message.reply("برجاء اختيار طريقة الدفع:", reply_markup=payment_keyboard)
+        message.reply("برجاء اختيار طريقة الدفع :", reply_markup=payment_keyboard)
         
     elif step == 3:  # إدخال المبلغ
         if not message.text.isdigit():
@@ -104,7 +103,7 @@ def handle_text(client, message):
         payment_method = user_data[chat_id]["payment_method"]
         
         if transaction_type == "deposit":
-            msg = f"قم بتحويل مبلغ {message.text} على {'رقم المحفظة' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل سكرين شوت بالتحويل."
+            msg = f"قم بتحويل مبلغ {message.text} على {'رقم المحفظة' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل سكرين شوت بالتحويل )صوره فقط( ."
         else:
             msg = f"قم بسحب مبلغ {message.text} على {'عنوان السحب' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل كود السحب."
         message.reply(msg)
@@ -115,7 +114,7 @@ def handle_photo(client, message):
     chat_id = message.chat.id
     if chat_id in user_data and user_data[chat_id].get("transaction_type") == "deposit":
         message.reply("برجاء الإنتظار .. جاري معالجة طلبك.")
-
+    else:
 # إرسال البيانات إلى الأدمن
         user_info = f"طلب جديد:\nالعملية: {transaction_type}\nالبرنامج: {user_data[chat_id]['platform']}\nID الحساب: {user_data[chat_id]['id']}\nطريقة الدفع: {payment_method}\nالمبلغ: {message.text}"
         bot.send_message(ADMIN_USER_ID, user_info)
@@ -125,7 +124,7 @@ def handle_code(client, message):
     chat_id = message.chat.id
     if chat_id in user_data and user_data[chat_id].get("transaction_type") == "withdraw":
         message.reply("برجاء الإنتظار .. جاري معالجة طلبك.")
-
+    else:
 # إرسال البيانات إلى الأدمن
         user_info = f"طلب جديد:\nالعملية: {transaction_type}\nالبرنامج: {user_data[chat_id]['platform']}\nID الحساب: {user_data[chat_id]['id']}\nطريقة الدفع: {payment_method}\nالمبلغ: {message.text}"
         bot.send_message(ADMIN_USER_ID, user_info)
