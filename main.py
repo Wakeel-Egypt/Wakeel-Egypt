@@ -94,14 +94,14 @@ def handle_text(client, message):
         
     elif step == 3:  # إدخال المبلغ
         if not message.text.isdigit():
-            message.reply("يرجى إدخال قيمة صحيحة .")
+            message.reply("يرجى إدخال قيمة صحيحة للمبلغ (أرقام فقط) .")
             return
         user_data[chat_id]["amount"] = message.text
         transaction_type = user_data[chat_id]["transaction_type"]
         payment_method = user_data[chat_id]["payment_method"]
         
         if transaction_type == "deposit":
-            msg = f"قم بتحويل مبلغ {message.text} على {'رقم المحفظة' if payment_method == 'wallet' else 'عنوان إنستاباي'} \n ****** \n ثم أرسل سكرين شوت بالتحويل (صوره فقط) ."
+            msg = f"قم بتحويل مبلغ {message.text} على {'رقم المحفظة' if payment_method == 'wallet' else 'عنوان إنستاباي'} \n ****** \n ثم أرسل سكرين شوت بالتحويل (صوره فقط حتي يتم إستكمال الطلب) ."
         else:
             msg = f"قم بسحب مبلغ {message.text} على {'عنوان السحب' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل كود السحب."
         message.reply(msg)
@@ -141,20 +141,6 @@ def handle_photo(client, message):
 
         # تعيين حالة العميل إلى "تم الإرسال"
         user_data[chat_id]["step"] = 0  # إيقاف إرسال أي رسائل أخرى
-
-
-@bot.on_message(filters.text)
-def handle_invalid_input(client, message):
-    chat_id = message.chat.id
-    if chat_id not in user_data:
-        return
-
-    step = user_data[chat_id]["step"]
-
-    # تحقق إذا كان العميل في الخطوة 4 وإذا أرسل نص أو رقم بدلاً من صورة
-    if step == 4:
-        message.reply("يرجى إرسال صورة فقط (سكرين شوت). لا يمكن إرسال أرقام أو حروف في هذه المرحلة.")
-        return
 
 
 bot.run()
