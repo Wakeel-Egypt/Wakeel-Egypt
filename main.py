@@ -1,3 +1,4 @@
+
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
@@ -27,7 +28,6 @@ def handle_callback(client, callback_query):
     chat_id = callback_query.message.chat.id
     data = callback_query.data
 
-    # تحديد ما إذا كان العميل في خطوة الإيداع أو السحب
     if data == "deposit" or data == "withdraw":
         user_data[chat_id]["transaction_type"] = data
         user_data[chat_id]["step"] = 1  # تحديد أن العميل في خطوة اختيار البرنامج
@@ -48,7 +48,6 @@ def handle_callback(client, callback_query):
         user_data[chat_id]["step"] = 3  # تحديد أن العميل في خطوة إدخال المبلغ
         callback_query.message.reply(" أدخل المبلغ :")
     
-    # الرجوع إلى الخطوة السابقة
     elif data == "back":
         step = user_data[chat_id].get("step", 0)
         if step == 1:
@@ -78,7 +77,6 @@ def handle_text(client, message):
     if chat_id not in user_data:
         return
 
-    # التعامل مع المدخلات من المستخدم
     step = user_data[chat_id]["step"]
     
     if step == 2:  # إدخال الID
@@ -107,26 +105,26 @@ def handle_text(client, message):
         else:
             msg = f"قم بسحب مبلغ {message.text} على {'عنوان السحب' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل كود السحب."
         message.reply(msg)
-        
 
 @bot.on_message(filters.photo)
 def handle_photo(client, message):
     chat_id = message.chat.id
-    if chat_id in user_data and user_data[chat_id].get("transaction_type") == "deposit":
-        # تحقق إذا كانت الرسالة صورة فقط
-        if not message.photo:
-            message.reply("يرجى إرسال صورة فقط (سكرين شوت).")
-            return
-        message.reply("برجاء الإنتظار .. جاري معالجة طلبك.")
-    else:
-        # إرسال البيانات إلى الأدمن
+    if chat_id not in user_data:
+        return
+    
+    if user_data[chat_id].get("transaction_type") == "deposit":
+        # إرسال البيانات إلى الأدمن بعد وصول الصورة
         user_info = f"طلب جديد:\nالعملية: {user_data[chat_id]['transaction_type']}\nالبرنامج: {user_data[chat_id]['platform']}\nID الحساب: {user_data[chat_id]['id']}\nطريقة الدفع: {user_data[chat_id]['payment_method']}\nالمبلغ: {user_data[chat_id]['amount']}"
         bot.send_message(ADMIN_USER_ID, user_info)
 
-@bot.on_message(filters.text)
-def handle_code(client, message):
-    chat_id = message.chat.id
-    if chat_id in user_data and user_data[chat_id].get("transaction_type") == "withdraw":
-        message.reply("برجاء الإنتظار .. جاري معالجة طلبك.")
-    
+        # إيقاف البوت عن إرسال أي رسائل أخرى
+        message.reply("تم إرسال طلبك بنجاح. سيتم متابعة المعاملة.")
+        
+        # تعيين حالة العميل إلى "تم الإرسال"
+        user_data[chat_id]["step"] = 0  # إيقاف إرسال أي رسائل أخرى
+
+    else:
+        message.reply("يرجى إرسال صورة فقط (سكرين شوت).")
+
 bot.run()
+
