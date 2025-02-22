@@ -19,7 +19,7 @@ def start(client, message):
     keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton(" إيداع ", callback_data="deposit")],
         [InlineKeyboardButton(" سحب ", callback_data="withdraw")],
-        [InlineKeyboardButton(" تنزيل البرامج ", callback_data="download_apps")]
+        [InlineKeyboardButton(" تنزيل البرامج برابط مباشر ", callback_data="download_apps")]
     ])
     message.reply("مرحبا بك في Wakeel Egypt. وكيلك الإلكتروني الأول في مصر. ما الخدمة التي تريدها ؟\n\n",
                   reply_markup=keyboard)
@@ -48,7 +48,7 @@ def handle_callback(client, callback_query):
             [InlineKeyboardButton("888StarZ", url="https://www.example.com/888starz")],
             [InlineKeyboardButton("Megapari", url="https://www.example.com/megapari")]
         ])
-        callback_query.message.reply("اختيار البرنامج الذي تريد تنزيله:", reply_markup=keyboard)
+        callback_query.message.reply("إختر البرنامج الذي تريد تنزيله :", reply_markup=keyboard)
 
     # التعامل مع باقي البيانات الخاصة بالعمليات المالية
     elif data in ["1xbet", "melbet", "linebet"]:
