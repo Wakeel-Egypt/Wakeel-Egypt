@@ -12,6 +12,7 @@ bot = Client("payment_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKE
 # تخزين بيانات المستخدمين
 user_data = {}
 
+# وظيفة البداية
 @bot.on_message(filters.command("start"))
 def start(client, message):
     user_data[message.chat.id] = {"step": 0}  # بداية من الخطوة الأولى
@@ -23,15 +24,15 @@ def start(client, message):
                   "*يرجى اختيار إحدى الخيارات:*",
                   reply_markup=keyboard)
 
+# التعامل مع التفاعلات (اختيارات المستخدم)
 @bot.on_callback_query()
 def handle_callback(client, callback_query):
     chat_id = callback_query.message.chat.id
     data = callback_query.data
 
-    # تحديد ما إذا كان العميل في خطوة الإيداع أو السحب
-    if data == "deposit" or data == "withdraw":
+    if data in ["deposit", "withdraw"]:
         user_data[chat_id]["transaction_type"] = data
-        user_data[chat_id]["step"] = 1  # تحديد أن العميل في خطوة اختيار البرنامج
+        user_data[chat_id]["step"] = 1
         keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton("🎲 1xBet", callback_data="1xbet")],
             [InlineKeyboardButton("🏆 Melbet", callback_data="melbet")],
@@ -41,15 +42,15 @@ def handle_callback(client, callback_query):
 
     elif data in ["1xbet", "melbet", "linebet"]:
         user_data[chat_id]["platform"] = data
-        user_data[chat_id]["step"] = 2  # تحديد أن العميل في خطوة إدخال الID
+        user_data[chat_id]["step"] = 2
         callback_query.message.reply("أكتب الID الخاص بحسابك.")
 
     elif data in ["wallet", "instapay"]:
         user_data[chat_id]["payment_method"] = data
-        user_data[chat_id]["step"] = 3  # تحديد أن العميل في خطوة إدخال المبلغ
+        user_data[chat_id]["step"] = 3
         callback_query.message.reply("أكتب المبلغ المراد إيداعه أو سحبه.")
     
-    # الرجوع إلى الخطوة السابقة
+    # العودة إلى الخطوة السابقة
     elif data == "back":
         step = user_data[chat_id].get("step", 0)
         if step == 1:
@@ -73,37 +74,40 @@ def handle_callback(client, callback_query):
             callback_query.message.reply("برجاء اختيار طريقة الدفع:", reply_markup=payment_keyboard)
         user_data[chat_id]["step"] -= 1  # العودة خطوة واحدة للخلف
 
+# التعامل مع المدخلات النصية
 @bot.on_message(filters.text)
 def handle_text(client, message):
     chat_id = message.chat.id
     if chat_id not in user_data:
         return
 
-    # التعامل مع المدخلات من المستخدم
+    # التعامل مع المدخلات بناءً على الخطوة الحالية
     step = user_data[chat_id]["step"]
-    
-    if step == 2:  # إدخال الID
+
+    # إدخال الـ ID
+    if step == 2:
         if not message.text.isdigit():
-            message.reply("رقم الحساب خطأ. يرجى إدخال ID الحساب كرقم.")
+            message.reply("رقم الحساب غير صحيح. يرجى إدخال ID الحساب كرقم فقط.")
             return
         user_data[chat_id]["id"] = message.text
         user_data[chat_id]["step"] = 3
         message.reply("برجاء اختيار طريقة الدفع.")
-        
+
         payment_keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton("💳 محفظة إلكترونية", callback_data="wallet")],
             [InlineKeyboardButton("💵 إنستاباي", callback_data="instapay")]
         ])
         message.reply("برجاء اختيار طريقة الدفع:", reply_markup=payment_keyboard)
-        
-    elif step == 3:  # إدخال المبلغ
+
+    # إدخال المبلغ
+    elif step == 3:
         if not message.text.isdigit():
             message.reply("يرجى إدخال مبلغ صحيح (رقم فقط).")
             return
         user_data[chat_id]["amount"] = message.text
         transaction_type = user_data[chat_id]["transaction_type"]
         payment_method = user_data[chat_id]["payment_method"]
-        
+
         if transaction_type == "deposit":
             msg = f"قم بتحويل مبلغ {message.text} على {'رقم المحفظة' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل سكرين شوت بالتحويل."
         else:
@@ -114,12 +118,14 @@ def handle_text(client, message):
         user_info = f"طلب جديد:\nالعملية: {transaction_type}\nالبرنامج: {user_data[chat_id]['platform']}\nID الحساب: {user_data[chat_id]['id']}\nطريقة الدفع: {payment_method}\nالمبلغ: {message.text}"
         bot.send_message(ADMIN_USER_ID, user_info)
 
+# التعامل مع الصور (في حالة الإيداع)
 @bot.on_message(filters.photo)
 def handle_photo(client, message):
     chat_id = message.chat.id
     if chat_id in user_data and user_data[chat_id].get("transaction_type") == "deposit":
         message.reply("برجاء الإنتظار .. جاري معالجة طلبك.")
 
+# التعامل مع الأكواد (في حالة السحب)
 @bot.on_message(filters.text)
 def handle_code(client, message):
     chat_id = message.chat.id
