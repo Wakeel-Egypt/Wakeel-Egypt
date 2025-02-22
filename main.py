@@ -106,26 +106,33 @@ def handle_text(client, message):
             msg = f"قم بسحب مبلغ {message.text} على {'عنوان السحب' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل كود السحب."
         message.reply(msg)
 
+
 @bot.on_message(filters.photo)
 def handle_photo(client, message):
     chat_id = message.chat.id
     if chat_id not in user_data:
+        return
 
+    # تحقق إذا كانت الصورة موجودة
+    if not message.photo:
+        message.reply("يرجى إرسال صورة فقط (سكرين شوت).")
         return
     
+    # إذا كانت الصورة موجودة، استمر في المعالجة
     if user_data[chat_id].get("transaction_type") == "deposit":
         # إرسال البيانات إلى الأدمن بعد وصول الصورة
         user_info = f"طلب جديد:\nالعملية: {user_data[chat_id]['transaction_type']}\nالبرنامج: {user_data[chat_id]['platform']}\nID الحساب: {user_data[chat_id]['id']}\nطريقة الدفع: {user_data[chat_id]['payment_method']}\nالمبلغ: {user_data[chat_id]['amount']}"
-        bot.send_message(ADMIN_USER_ID, user_info)
-
-        # إيقاف البوت عن إرسال أي رسائل أخرى
-        message.reply("تم إرسال طلبك بنجاح. سيتم متابعة المعاملة.")
         
+        # إرسال الصورة للأدمن أيضًا
+        bot.send_message(ADMIN_USER_ID, user_info)
+        bot.send_photo(ADMIN_USER_ID, message.photo.file_id)
+
+        # إيقاف التفاعل مع العميل بعد إرسال طلبه
+        message.reply("تم إرسال طلبك بنجاح. سيتم متابعة المعاملة.")
+
         # تعيين حالة العميل إلى "تم الإرسال"
         user_data[chat_id]["step"] = 0  # إيقاف إرسال أي رسائل أخرى
 
-    else:
-        message.reply("يرجى إرسال صورة فقط (سكرين شوت).")
 
 bot.run()
 
