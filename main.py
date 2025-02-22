@@ -45,9 +45,9 @@ def handle_callback(client, callback_query):
 
     elif data in ["wallet", "instapay"]:
         user_data[chat_id]["payment_method"] = data
-        user_data[chat_id]["step"] = 3  # تحديد أن العميل في خطوة إدخال المبلغ
-        callback_query.message.reply(" أدخل المبلغ :")
-    
+        user_data[chat_id]["step"] = 3  # تحديد أن العميل في خطوة إدخال البيانات الإضافية (رقم المحفظة أو عنوان إنستاباي)
+        callback_query.message.reply("برجاء إدخال رقم المحفظة المرسل منها/الاستلام أو عنوان إنستاباي المرسل منه/الاستلام:")
+
     elif data == "back":
         step = user_data[chat_id].get("step", 0)
         if step == 1:
@@ -92,7 +92,13 @@ def handle_text(client, message):
         ])
         message.reply("برجاء اختيار طريقة الدفع :", reply_markup=payment_keyboard)
         
-    elif step == 3:  # إدخال المبلغ
+    elif step == 3:  # إدخال البيانات الإضافية (رقم المحفظة أو عنوان إنستاباي)
+        user_data[chat_id]["wallet_or_insta"] = message.text
+        user_data[chat_id]["step"] = 4  # الانتقال إلى خطوة إدخال المبلغ
+        
+        message.reply("أدخل المبلغ:")
+
+    elif step == 4:  # إدخال المبلغ
         if not message.text.isdigit():
             message.reply("يرجى إدخال قيمة صحيحة للمبلغ (أرقام فقط) .")
             return
@@ -105,16 +111,10 @@ def handle_text(client, message):
         else:
             msg = f"قم بسحب مبلغ {message.text}  على نقطة السحب بالبرنامج\n ******** \n ثم أرسل سكرين شوت لكود السحب (صورة فقط حتي يتم إستكمال الطلب) ."
         
-        # إضافة البند الإضافي بعد اختيار طريقة الدفع
-        if payment_method == "wallet":
-            msg += "\nبرجاء إدخال رقم المحفظة المرسل منها/الاستلام."
-        else:
-            msg += "\nبرجاء إدخال عنوان إنستاباي المرسل منه/الاستلام."
-        
         message.reply(msg)
 
         # تحديث خطوة العميل بحيث يصبح إرسال الصورة فقط هو المتاح
-        user_data[chat_id]["step"] = 4  # الخطوة التي تسمح بإرسال الصور فقط
+        user_data[chat_id]["step"] = 5  # الخطوة التي تسمح بإرسال الصور فقط
 
 
 @bot.on_message(filters.photo)
@@ -132,9 +132,9 @@ def handle_photo(client, message):
         
         # إضافة رقم المحفظة أو عنوان إنستاباي للإيداع
         if user_data[chat_id]["payment_method"] == "wallet":
-            user_info += f"\nرقم المحفظة المرسل منها: {message.text}"
+            user_info += f"\nرقم المحفظة المرسل منها: {user_data[chat_id]['wallet_or_insta']}"
         elif user_data[chat_id]["payment_method"] == "instapay":
-            user_info += f"\nعنوان إنستاباي المرسل منه: {message.text}"
+            user_info += f"\nعنوان إنستاباي المرسل منه: {user_data[chat_id]['wallet_or_insta']}"
 
         # إرسال الصورة للأدمن أيضًا
         bot.send_message(ADMIN_USER_ID, user_info)
