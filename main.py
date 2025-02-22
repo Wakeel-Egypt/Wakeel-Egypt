@@ -1,4 +1,3 @@
-
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
@@ -138,4 +137,3 @@ def handle_code(client, message):
         message.reply("برجاء الإنتظار .. جاري معالجة طلبك.")
 
 bot.run()
-
