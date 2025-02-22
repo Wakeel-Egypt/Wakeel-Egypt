@@ -106,6 +106,9 @@ def handle_text(client, message):
             msg = f"قم بسحب مبلغ {message.text} على {'عنوان السحب' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل كود السحب."
         message.reply(msg)
 
+        # تحديث خطوة العميل بحيث يصبح إرسال الصورة فقط هو المتاح
+        user_data[chat_id]["step"] = 4  # الخطوة التي تسمح بإرسال الصور فقط
+
 
 @bot.on_message(filters.photo)
 def handle_photo(client, message):
@@ -113,7 +116,13 @@ def handle_photo(client, message):
     if chat_id not in user_data:
         return
 
+    step = user_data[chat_id]["step"]
+
     # تحقق إذا كانت الصورة موجودة
+    if step != 4:
+        message.reply("يرجى إرسال صورة فقط (سكرين شوت).")
+        return
+    
     if not message.photo:
         message.reply("يرجى إرسال صورة فقط (سكرين شوت).")
         return
