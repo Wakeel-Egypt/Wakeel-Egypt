@@ -124,7 +124,8 @@ def handle_photo(client, message):
         # تعيين حالة العميل إلى "تم الإرسال"
         user_data[chat_id]["step"] = 0  # إيقاف إرسال أي رسائل أخرى
 
-    
+    else:
+        message.reply("يرجى إرسال صورة فقط (سكرين شوت).")
 
 bot.run()
 
