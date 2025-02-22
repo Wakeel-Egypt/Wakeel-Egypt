@@ -46,7 +46,7 @@ def handle_callback(client, callback_query):
     elif data in ["wallet", "instapay"]:
         user_data[chat_id]["payment_method"] = data
         user_data[chat_id]["step"] = 3  # تحديد أن العميل في خطوة إدخال المبلغ
-        callback_query.message.reply(" أدخل المبلغ .")
+        callback_query.message.reply(" أدخل المبلغ :")
     
     # الرجوع إلى الخطوة السابقة
     elif data == "back":
