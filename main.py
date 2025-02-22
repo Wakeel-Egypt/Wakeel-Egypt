@@ -190,7 +190,8 @@ def new_request(client, callback_query):
     keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton(" إيداع ", callback_data="deposit")],
         [InlineKeyboardButton(" سحب ", callback_data="withdraw")],
-        [InlineKeyboardButton(" تنزيل البرامج برابط مباشر ", callback_data="download_apps")]
+        [InlineKeyboardButton(" تنزيل البرامج برابط مباشر ", callback_data="download_apps")],
+        [InlineKeyboardButton(" طلب سحب/إيداع جديد ", callback_data="new_request")]
     ])
     callback_query.message.edit_text("مرحبا بك في Wakeel Egypt. وكيلك الإلكتروني الأول في مصر. ما الخدمة التي تريدها ؟\n\n",
                                     reply_markup=keyboard)
