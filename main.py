@@ -143,5 +143,19 @@ def handle_photo(client, message):
         user_data[chat_id]["step"] = 0  # إيقاف إرسال أي رسائل أخرى
 
 
+@bot.on_message(filters.text)
+def handle_invalid_input(client, message):
+    chat_id = message.chat.id
+    if chat_id not in user_data:
+        return
+
+    step = user_data[chat_id]["step"]
+
+    # تحقق إذا كان العميل في الخطوة 4 وإذا أرسل نص أو رقم بدلاً من صورة
+    if step == 4:
+        message.reply("يرجى إرسال صورة فقط (سكرين شوت). لا يمكن إرسال أرقام أو حروف في هذه المرحلة.")
+        return
+
+
 bot.run()
 
