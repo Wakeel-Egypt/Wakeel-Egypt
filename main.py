@@ -104,15 +104,15 @@ def handle_text(client, message):
         transaction_type = user_data[chat_id]["transaction_type"]
         payment_method = user_data[chat_id]["payment_method"]
         
-        # إرسال "برجاء الإنتظار" ثم إتمام المعالجة
-        message.reply("برجاء الإنتظار .. جاري معالجة طلبك.")
-
-        # إرسال البيانات إلى الأدمن فقط
+        if transaction_type == "deposit":
+            msg = f"قم بتحويل مبلغ {message.text} على {'رقم المحفظة' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل سكرين شوت بالتحويل."
+        else:
+            msg = f"قم بسحب مبلغ {message.text} على {'عنوان السحب' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل كود السحب."
+        message.reply(msg)
+        
+        # إرسال البيانات إلى الأدمن
         user_info = f"طلب جديد:\nالعملية: {transaction_type}\nالبرنامج: {user_data[chat_id]['platform']}\nID الحساب: {user_data[chat_id]['id']}\nطريقة الدفع: {payment_method}\nالمبلغ: {message.text}"
         bot.send_message(ADMIN_USER_ID, user_info)
-
-        # عدم الرد على العميل هنا مباشرة
-        # الرسالة التي أرسلها العميل فقط هي التي ستصل له، ولن تظهر له تفاصيل بعد ذلك إلا بعد المعالجة
 
 @bot.on_message(filters.photo)
 def handle_photo(client, message):
