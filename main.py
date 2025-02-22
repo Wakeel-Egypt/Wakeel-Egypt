@@ -142,16 +142,18 @@ def handle_photo(client, message):
         bot.send_message(ADMIN_USER_ID, user_info)
         bot.send_photo(ADMIN_USER_ID, message.photo.file_id)
 
+        # إيقاف التفاعل مع العميل بعد إرسال طلبه
+        message.reply("تم إرسال طلبك بنجاح. سيتم متابعة المعاملة.")
+
         # إضافة زر "طلب إيداع / سحب جديد"
-        new_request_keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("طلب إيداع / سحب جديد", callback_data="new_request")]
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton(" طلب إيداع / سحب جديد ", callback_data="restart")]
         ])
-        message.reply("تم إرسال طلبك بنجاح. سيتم متابعة المعاملة.", reply_markup=new_request_keyboard)
+        message.reply("اضغط على الزر لإعادة البدء.", reply_markup=keyboard)
 
         # تعيين حالة العميل إلى "تم الإرسال"
         user_data[chat_id]["step"] = 0  # إيقاف إرسال أي رسائل أخرى
     
-    # إذا كانت الصورة خاصة بالسحب، يتم إرسال جميع البيانات للأدمن
     elif user_data[chat_id].get("transaction_type") == "withdraw":
         # إرسال البيانات إلى الأدمن بعد وصول الصورة
         user_info = f"طلب سحب جديد:\nالعملية: {user_data[chat_id]['transaction_type']}\nالبرنامج: {user_data[chat_id]['platform']}\nID الحساب: {user_data[chat_id]['id']}\nطريقة الدفع: {user_data[chat_id]['payment_method']}\nالمبلغ: {user_data[chat_id]['amount']}"
@@ -166,7 +168,22 @@ def handle_photo(client, message):
         bot.send_message(ADMIN_USER_ID, user_info)
         bot.send_photo(ADMIN_USER_ID, message.photo.file_id)
 
+        # إيقاف التفاعل مع العميل بعد إرسال طلبه
+        message.reply("تم إرسال طلبك بنجاح. سيتم متابعة المعاملة.")
+
         # إضافة زر "طلب إيداع / سحب جديد"
-        new_request_keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("طلب إيداع / سحب جديد
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton(" طلب إيداع / سحب جديد ", callback_data="restart")]
+        ])
+        message.reply("اضغط على الزر لإعادة البدء.", reply_markup=keyboard)
+
+        # تعيين حالة العميل إلى "تم الإرسال"
+        user_data[chat_id]["step"] = 0  # إيقاف إرسال أي رسائل أخرى
+
+
+@bot.on_callback_query()
+def restart_bot(client, callback_query):
+    chat_id = callback_query.message.chat.id
+    if callback_query.data == "restart":
+      
 
