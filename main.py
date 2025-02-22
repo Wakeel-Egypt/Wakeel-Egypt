@@ -155,11 +155,8 @@ def handle_photo(client, message):
         bot.send_message(ADMIN_USER_ID, user_info)
         bot.send_photo(ADMIN_USER_ID, message.photo.file_id)
 
-        # إضافة الزر في الرسالة بعد إرسال البيانات
-        keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("طلب سحب/إيداع جديد", callback_data="new_request")]
-        ])
-        message.reply("تم إرسال طلبك بنجاح. سيتم متابعة المعاملة.", reply_markup=keyboard)
+        # إيقاف التفاعل مع العميل بعد إرسال طلبه
+        message.reply("تم إرسال طلبك بنجاح. سيتم متابعة المعاملة.")
 
         # تعيين حالة العميل إلى "تم الإرسال"
         user_data[chat_id]["step"] = 0  # إيقاف إرسال أي رسائل أخرى
@@ -179,23 +176,24 @@ def handle_photo(client, message):
         bot.send_message(ADMIN_USER_ID, user_info)
         bot.send_photo(ADMIN_USER_ID, message.photo.file_id)
 
-        # إضافة الزر في الرسالة بعد إرسال البيانات
-        keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("طلب سحب/إيداع جديد", callback_data="new_request")]
-        ])
-        message.reply("تم إرسال طلبك بنجاح. سيتم متابعة المعاملة.", reply_markup=keyboard)
+        # إيقاف التفاعل مع العميل بعد إرسال طلبه
+        message.reply("تم إرسال طلبك بنجاح. سيتم متابعة المعاملة .")
 
         # تعيين حالة العميل إلى "تم الإرسال"
         user_data[chat_id]["step"] = 0  # إيقاف إرسال أي رسائل أخرى
 
-
-# التعامل مع الزر عند الضغط عليه
 @bot.on_callback_query(filters.regex("new_request"))
 def new_request(client, callback_query):
     chat_id = callback_query.message.chat.id
-    # هنا نقوم بإعادة الأمر /start عند الضغط على الزر
-    start(client, callback_query.message)
+    # إعادة التوجيه إلى بداية الخدمة (كما في حالة الأمر /start)
+    user_data[chat_id] = {"step": 0}  # إعادة ضبط حالة المستخدم
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton(" إيداع ", callback_data="deposit")],
+        [InlineKeyboardButton(" سحب ", callback_data="withdraw")],
+        [InlineKeyboardButton(" تنزيل البرامج برابط مباشر ", callback_data="download_apps")]
+    ])
+    callback_query.message.edit_text("مرحبا بك في Wakeel Egypt. وكيلك الإلكتروني الأول في مصر. ما الخدمة التي تريدها ؟\n\n",
+                                    reply_markup=keyboard)
 
 bot.run()
-
 
