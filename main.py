@@ -90,7 +90,7 @@ def handle_text(client, message):
             [InlineKeyboardButton(" محفظة إلكترونية ", callback_data="wallet")],
             [InlineKeyboardButton(" إنستاباي ", callback_data="instapay")]
         ])
-        message.reply("برجاء اختيار طريقة السحب :", reply_markup=payment_keyboard)
+        message.reply("برجاء اختيار طريقة الدفع :", reply_markup=payment_keyboard)
         
     elif step == 3:  # إدخال المبلغ
         if not message.text.isdigit():
