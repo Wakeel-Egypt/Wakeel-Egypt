@@ -34,24 +34,20 @@ def handle_callback(client, callback_query):
         keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton(" 1xBet ", callback_data="1xbet")],
             [InlineKeyboardButton(" Melbet ", callback_data="melbet")],
-            [InlineKeyboardButton(" Linebet ", callback_data="linebet")],
-            [InlineKeyboardButton(" العودة", callback_data="back")]
+            [InlineKeyboardButton(" Linebet ", callback_data="linebet")]
         ])
         callback_query.message.reply("برجاء اختيار البرنامج :", reply_markup=keyboard)
 
     elif data in ["1xbet", "melbet", "linebet"]:
         user_data[chat_id]["platform"] = data
         user_data[chat_id]["step"] = 2  # تحديد أن العميل في خطوة إدخال الID
-        keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("أدخل ID الحساب", callback_data="id_input")],
-            [InlineKeyboardButton(" العودة", callback_data="back")]
-        ])
-        callback_query.message.reply("أكتب الID الخاص بحسابك.", reply_markup=keyboard)
+        callback_query.message.reply("أكتب الID الخاص بحسابك.")
 
-    elif data == "id_input":
+    elif data in ["wallet", "instapay"]:
+        user_data[chat_id]["payment_method"] = data
         user_data[chat_id]["step"] = 3  # تحديد أن العميل في خطوة إدخال المبلغ
-        callback_query.message.reply("أدخل المبلغ الذي ترغب في إيداعه أو سحبه.")
-
+        callback_query.message.reply(" أدخل المبلغ :")
+    
     elif data == "back":
         step = user_data[chat_id].get("step", 0)
         if step == 1:
@@ -92,8 +88,7 @@ def handle_text(client, message):
         
         payment_keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton(" محفظة إلكترونية ", callback_data="wallet")],
-            [InlineKeyboardButton(" إنستاباي ", callback_data="instapay")],
-            [InlineKeyboardButton(" العودة", callback_data="back")]
+            [InlineKeyboardButton(" إنستاباي ", callback_data="instapay")]
         ])
         message.reply("برجاء اختيار طريقة الدفع :", reply_markup=payment_keyboard)
         
@@ -149,4 +144,3 @@ def handle_photo(client, message):
 
 
 bot.run()
-
