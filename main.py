@@ -1,3 +1,4 @@
+
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
 
@@ -52,7 +53,8 @@ def handle_text(client, message):
     chat_id = message.chat.id
     if chat_id not in user_data:
         return
-    
+
+    # المرحلة الأولى - اختيار البرنامج
     if "platform" not in user_data[chat_id]:
         user_data[chat_id]["platform"] = message.text
         keyboard = InlineKeyboardMarkup([
@@ -60,15 +62,23 @@ def handle_text(client, message):
              InlineKeyboardButton("إنستاباي", callback_data="instapay")]
         ])
         message.reply("اختر طريقة الدفع.", reply_markup=keyboard)
-    
+
+    # المرحلة الثانية - اختيار طريقة الدفع
     elif "payment_method" not in user_data[chat_id]:
         user_data[chat_id]["id"] = message.text
         message.reply("برجاء اختيار طريقة الدفع.")
     
+    # المرحلة الثالثة - إدخال المبلغ
     elif "amount" not in user_data[chat_id]:
+        # التحقق من أن المدخل هو رقم فقط
+        if not message.text.isdigit():
+            message.reply("يرجى إدخال مبلغ صحيح (رقم فقط).")
+            return
         user_data[chat_id]["amount"] = message.text
         transaction_type = user_data[chat_id]["transaction_type"]
         payment_method = user_data[chat_id]["payment_method"]
+        
+        # تحديد الرسالة حسب نوع العملية وطريقة الدفع
         if transaction_type == "deposit":
             msg = f"قم بتحويل مبلغ {message.text} على {'رقم المحفظة' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل سكرين شوت بالتحويل."
         else:
@@ -92,3 +102,4 @@ def handle_code(client, message):
         message.reply("برجاء الإنتظار .. جارى معالجة طلبك.")
 
 bot.run()
+
