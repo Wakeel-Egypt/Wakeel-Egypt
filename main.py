@@ -41,7 +41,7 @@ def handle_callback(client, callback_query):
     elif data in ["1xbet", "melbet", "linebet"]:
         user_data[chat_id]["platform"] = data
         user_data[chat_id]["step"] = 2  # تحديد أن العميل في خطوة إدخال الID
-        callback_query.message.reply("أكتب الID الخاص بحسابك.")
+        callback_query.message.reply("أكتب الID الخاص بحسابك (أرقام فقط) .")
 
     elif data in ["wallet", "instapay"]:
         user_data[chat_id]["payment_method"] = data
@@ -101,7 +101,7 @@ def handle_text(client, message):
         payment_method = user_data[chat_id]["payment_method"]
         
         if transaction_type == "deposit":
-            msg = f"قم بتحويل مبلغ {message.text} على {'رقم المحفظة' if payment_method == 'wallet' else 'عنوان إنستاباي'} \n ****** \nثم أرسل سكرين شوت بالتحويل (صوره فقط حتي يتم إستكمال الطلب) ."
+            msg = f"قم بتحويل مبلغ {message.text} على {'رقم المحفظة' if payment_method == 'wallet' else 'عنوان إنستاباي'} \n ****** \nثم أرسل سكرين شوت بالتحويل (صورة فقط حتي يتم إستكمال الطلب) ."
         else:
             msg = f"قم بسحب مبلغ {message.text} على {'عنوان السحب' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل كود السحب."
         message.reply(msg)
@@ -117,15 +117,6 @@ def handle_photo(client, message):
         return
 
     step = user_data[chat_id]["step"]
-
-    # تحقق إذا كانت الصورة موجودة
-    if step != 4:
-        message.reply("يرجى إرسال صورة فقط (سكرين شوت).")
-        return
-    
-    if not message.photo:
-        message.reply("يرجى إرسال صورة فقط (سكرين شوت).")
-        return
     
     # إذا كانت الصورة موجودة، استمر في المعالجة
     if user_data[chat_id].get("transaction_type") == "deposit":
