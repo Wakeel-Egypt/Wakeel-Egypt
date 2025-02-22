@@ -1,4 +1,3 @@
-
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
 
@@ -27,26 +26,62 @@ def handle_callback(client, callback_query):
     chat_id = callback_query.message.chat.id
     data = callback_query.data
     
-    if data in ["deposit", "withdraw"]:
+    if data == "deposit" or data == "withdraw":
         user_data[chat_id]["transaction_type"] = data
         keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton("1xBet", callback_data="1xbet"),
              InlineKeyboardButton("Melbet", callback_data="melbet"),
-             InlineKeyboardButton("Linebet", callback_data="linebet")]
+             InlineKeyboardButton("Linebet", callback_data="linebet")],
+            [InlineKeyboardButton("رجوع", callback_data="back_to_service")]
         ])
-        callback_query.message.edit("برجاء اختيار البرنامج.", reply_markup=keyboard)
-    
+        bot.send_message(chat_id, "برجاء اختيار البرنامج.", reply_markup=keyboard)
+
     elif data in ["1xbet", "melbet", "linebet"]:
         user_data[chat_id]["platform"] = data
-        callback_query.message.edit("أكتب الID الخاص بحسابك.")
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("محفظة إلكترونية", callback_data="wallet"),
+             InlineKeyboardButton("إنستاباي", callback_data="instapay")],
+            [InlineKeyboardButton("رجوع", callback_data="back_to_transaction_type")]
+        ])
+        bot.send_message(chat_id, "أكتب الID الخاص بحسابك.", reply_markup=keyboard)
     
     elif data in ["wallet", "instapay"]:
         user_data[chat_id]["payment_method"] = data
         transaction_type = user_data[chat_id]["transaction_type"]
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("رجوع", callback_data="back_to_platform")]
+        ])
         if transaction_type == "deposit":
-            callback_query.message.edit("أدخل المبلغ المراد إيداعه.")
+            bot.send_message(chat_id, "أدخل المبلغ المراد إيداعه.", reply_markup=keyboard)
         else:
-            callback_query.message.edit("أدخل المبلغ المراد سحبه.")
+            bot.send_message(chat_id, "أدخل المبلغ المراد سحبه.", reply_markup=keyboard)
+
+    elif data == "back_to_service":
+        del user_data[chat_id]["transaction_type"]
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("إيداع", callback_data="deposit"),
+             InlineKeyboardButton("سحب", callback_data="withdraw")]
+        ])
+        bot.send_message(chat_id, "برجاء اختيار الخدمة مرة أخرى.", reply_markup=keyboard)
+
+    elif data == "back_to_transaction_type":
+        del user_data[chat_id]["platform"]
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("1xBet", callback_data="1xbet"),
+             InlineKeyboardButton("Melbet", callback_data="melbet"),
+             InlineKeyboardButton("Linebet", callback_data="linebet")],
+            [InlineKeyboardButton("رجوع", callback_data="back_to_service")]
+        ])
+        bot.send_message(chat_id, "برجاء اختيار البرنامج مرة أخرى.", reply_markup=keyboard)
+
+    elif data == "back_to_platform":
+        del user_data[chat_id]["payment_method"]
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("محفظة إلكترونية", callback_data="wallet"),
+             InlineKeyboardButton("إنستاباي", callback_data="instapay")],
+            [InlineKeyboardButton("رجوع", callback_data="back_to_transaction_type")]
+        ])
+        bot.send_message(chat_id, "برجاء اختيار طريقة الدفع مرة أخرى.", reply_markup=keyboard)
 
 @bot.on_message(filters.text)
 def handle_text(client, message):
@@ -59,7 +94,8 @@ def handle_text(client, message):
         user_data[chat_id]["platform"] = message.text
         keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton("محفظة إلكترونية", callback_data="wallet"),
-             InlineKeyboardButton("إنستاباي", callback_data="instapay")]
+             InlineKeyboardButton("إنستاباي", callback_data="instapay")],
+            [InlineKeyboardButton("رجوع", callback_data="back_to_transaction_type")]
         ])
         message.reply("اختر طريقة الدفع.", reply_markup=keyboard)
 
@@ -102,4 +138,3 @@ def handle_code(client, message):
         message.reply("برجاء الإنتظار .. جارى معالجة طلبك.")
 
 bot.run()
-
