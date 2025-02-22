@@ -46,30 +46,19 @@ def handle_callback(client, callback_query):
     elif data in ["wallet", "instapay"]:
         user_data[chat_id]["payment_method"] = data
         user_data[chat_id]["step"] = 3  # تحديد أن العميل في خطوة إدخال البيانات الإضافية (رقم المحفظة أو عنوان إنستاباي)
-        callback_query.message.reply("برجاء إدخال رقم المحفظة المرسل منها/إليها \nأو عنوان إنستاباي المرسل منه/إليه:")
-
-    elif data == "back":
-        step = user_data[chat_id].get("step", 0)
-        if step == 1:
-            keyboard = InlineKeyboardMarkup([
-                [InlineKeyboardButton(" إيداع ", callback_data="deposit")],
-                [InlineKeyboardButton(" سحب ", callback_data="withdraw")]
-            ])
-            callback_query.message.reply("ما الخدمة التي تريدها؟", reply_markup=keyboard)
-        elif step == 2:
-            keyboard = InlineKeyboardMarkup([
-                [InlineKeyboardButton(" 1xBet ", callback_data="1xbet")],
-                [InlineKeyboardButton(" Melbet ", callback_data="melbet")],
-                [InlineKeyboardButton(" Linebet ", callback_data="linebet")]
-            ])
-            callback_query.message.reply("برجاء اختيار البرنامج :", reply_markup=keyboard)
-        elif step == 3:
-            payment_keyboard = InlineKeyboardMarkup([
-                [InlineKeyboardButton(" محفظة إلكترونية ", callback_data="wallet")],
-                [InlineKeyboardButton(" إنستاباي ", callback_data="instapay")]
-            ])
-            callback_query.message.reply("برجاء اختيار طريقة الدفع:", reply_markup=payment_keyboard)
-        user_data[chat_id]["step"] -= 1  # العودة خطوة واحدة للخلف
+        
+        # تحديد الرسالة المناسبة بناءً على نوع العملية وطريقة الدفع
+        transaction_type = user_data[chat_id]["transaction_type"]
+        if transaction_type == "deposit":
+            if data == "wallet":
+                callback_query.message.reply("برجاء إدخال رقم المحفظة المرسل منها:")
+            elif data == "instapay":
+                callback_query.message.reply("برجاء إدخال عنوان إنستاباي المحول منه:")
+        elif transaction_type == "withdraw":
+            if data == "wallet":
+                callback_query.message.reply("برجاء إدخال رقم المحفظة المحول إليها:")
+            elif data == "instapay":
+                callback_query.message.reply("برجاء إدخال عنوان إنستاباي المحول إليه:")
 
 @bot.on_message(filters.text)
 def handle_text(client, message):
@@ -162,7 +151,7 @@ def handle_photo(client, message):
         bot.send_photo(ADMIN_USER_ID, message.photo.file_id)
 
         # إيقاف التفاعل مع العميل بعد إرسال طلبه
-        message.reply("تم إرسال طلبك بنجاح .")
+        message.reply("تم إرسال طلبك بنجاح. سيتم متابعة المعاملة.")
 
         # تعيين حالة العميل إلى "تم الإرسال"
         user_data[chat_id]["step"] = 0  # إيقاف إرسال أي رسائل أخرى
