@@ -34,20 +34,24 @@ def handle_callback(client, callback_query):
         keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton(" 1xBet ", callback_data="1xbet")],
             [InlineKeyboardButton(" Melbet ", callback_data="melbet")],
-            [InlineKeyboardButton(" Linebet ", callback_data="linebet")]
+            [InlineKeyboardButton(" Linebet ", callback_data="linebet")],
+            [InlineKeyboardButton(" العودة", callback_data="back")]
         ])
         callback_query.message.reply("برجاء اختيار البرنامج :", reply_markup=keyboard)
 
     elif data in ["1xbet", "melbet", "linebet"]:
         user_data[chat_id]["platform"] = data
         user_data[chat_id]["step"] = 2  # تحديد أن العميل في خطوة إدخال الID
-        callback_query.message.reply("أكتب الID الخاص بحسابك.")
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("أدخل ID الحساب", callback_data="id_input")],
+            [InlineKeyboardButton(" العودة", callback_data="back")]
+        ])
+        callback_query.message.reply("أكتب الID الخاص بحسابك.", reply_markup=keyboard)
 
-    elif data in ["wallet", "instapay"]:
-        user_data[chat_id]["payment_method"] = data
+    elif data == "id_input":
         user_data[chat_id]["step"] = 3  # تحديد أن العميل في خطوة إدخال المبلغ
-        callback_query.message.reply(" أدخل المبلغ :")
-    
+        callback_query.message.reply("أدخل المبلغ الذي ترغب في إيداعه أو سحبه.")
+
     elif data == "back":
         step = user_data[chat_id].get("step", 0)
         if step == 1:
@@ -88,7 +92,8 @@ def handle_text(client, message):
         
         payment_keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton(" محفظة إلكترونية ", callback_data="wallet")],
-            [InlineKeyboardButton(" إنستاباي ", callback_data="instapay")]
+            [InlineKeyboardButton(" إنستاباي ", callback_data="instapay")],
+            [InlineKeyboardButton(" العودة", callback_data="back")]
         ])
         message.reply("برجاء اختيار طريقة الدفع :", reply_markup=payment_keyboard)
         
@@ -101,7 +106,7 @@ def handle_text(client, message):
         payment_method = user_data[chat_id]["payment_method"]
         
         if transaction_type == "deposit":
-            msg = f"قم بتحويل مبلغ {message.text} على {'رقم المحفظة' if payment_method == 'wallet' else 'عنوان إنستاباي'} \n ****** \n ثم أرسل سكرين شوت بالتحويل (صوره فقط حتي يتم إستكمال الطلب) ."
+            msg = f"قم بتحويل مبلغ {message.text} على {'رقم المحفظة' if payment_method == 'wallet' else 'عنوان إنستاباي'} \n ****** \nثم أرسل سكرين شوت بالتحويل (صوره فقط حتي يتم إستكمال الطلب) ."
         else:
             msg = f"قم بسحب مبلغ {message.text} على {'عنوان السحب' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل كود السحب."
         message.reply(msg)
