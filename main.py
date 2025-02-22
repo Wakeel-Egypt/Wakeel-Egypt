@@ -106,7 +106,7 @@ def handle_text(client, message):
             msg = f"قم بتحويل مبلغ {message.text} على {'رقم المحفظة' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل سكرين شوت بالتحويل )صوره فقط)."
         else:
             msg = f"قم بسحب مبلغ {message.text} على {'عنوان السحب' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل كود السحب."
-        message.reply(" يرجي إدخال قيمة صحيحة .")
+        message.reply(msg)
         
 
 @bot.on_message(filters.photo)
