@@ -42,11 +42,11 @@ def handle_callback(client, callback_query):
     elif data == "download_apps":
         # إضافة أزرار البرامج التي يمكن تنزيلها
         keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("1xBet", url="https://www.example.com/1xbet")],
-            [InlineKeyboardButton("Melbet", url="https://www.example.com/melbet")],
-            [InlineKeyboardButton("Linebet", url="https://www.example.com/linebet")],
+            [InlineKeyboardButton("1xBet", url="https://affpa.top/L?tag=d_3405078m_70865c_&site=3405078&ad=70865")],
+            [InlineKeyboardButton("Melbet", url="https://refpakrtsb.top/L?tag=d_3405089m_18775c_&site=3405089&ad=18775")],
+            [InlineKeyboardButton("Linebet", url="https://lb-aff.com/L?tag=d_3405121m_66803c_&site=3405121&ad=66803")],
             [InlineKeyboardButton("888StarZ", url="https://www.example.com/888starz")],
-            [InlineKeyboardButton("Megapari", url="https://www.example.com/megapari")]
+            [InlineKeyboardButton("Megapari", url="https://refpaiozdg.top/L?tag=d_4029361m_54987c_&site=4029361&ad=54987")]
         ])
         callback_query.message.reply("إختر البرنامج الذي تريد تنزيله :", reply_markup=keyboard)
 
