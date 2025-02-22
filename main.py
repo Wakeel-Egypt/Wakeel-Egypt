@@ -1,4 +1,4 @@
- from pyrogram import Client, filters
+from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 # تعيين متغيرات البوت
@@ -95,7 +95,7 @@ def handle_text(client, message):
         message.reply("برجاء اختيار طريقة الدفع :", reply_markup=payment_keyboard)
         
     elif step == 3:  # إدخال المبلغ
-        if not message.text.isdigit():  # التحقق من أن المبلغ رقمي
+        if not message.text.isdigit():
             message.reply("يرجى إدخال مبلغ صحيح (رقم فقط).")
             return
         user_data[chat_id]["amount"] = message.text
@@ -107,18 +107,18 @@ def handle_text(client, message):
         else:
             msg = f"قم بسحب مبلغ {message.text} على {'عنوان السحب' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل كود السحب."
         message.reply(msg)
+        
 
 @bot.on_message(filters.photo)
 def handle_photo(client, message):
     chat_id = message.chat.id
     if chat_id in user_data and user_data[chat_id].get("transaction_type") == "deposit":
-        # هنا يجب أن تظهر الرسالة إذا كانت الصورة هي المطلوبة فقط
-        message.reply("برجاء الإنتظار .. جاري معالجة طلبك.")
-    else:
         # تحقق إذا كانت الرسالة صورة فقط
         if not message.photo:
             message.reply("يرجى إرسال صورة فقط (سكرين شوت).")
             return
+        message.reply("برجاء الإنتظار .. جاري معالجة طلبك.")
+    else:
         # إرسال البيانات إلى الأدمن
         user_info = f"طلب جديد:\nالعملية: {user_data[chat_id]['transaction_type']}\nالبرنامج: {user_data[chat_id]['platform']}\nID الحساب: {user_data[chat_id]['id']}\nطريقة الدفع: {user_data[chat_id]['payment_method']}\nالمبلغ: {user_data[chat_id]['amount']}"
         bot.send_message(ADMIN_USER_ID, user_info)
@@ -130,4 +130,3 @@ def handle_code(client, message):
         message.reply("برجاء الإنتظار .. جاري معالجة طلبك.")
     
 bot.run()
-
