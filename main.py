@@ -1,12 +1,13 @@
 
+import os
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-# تعيين متغيرات البوت
-API_ID = "20267178"
-API_HASH = "5d0d025e0b607f4f51d76e764846040f"
-BOT_TOKEN = "8155646143:AAGK22ulfCKrlRDqCFwk2h5mS76gKCgIK5c"
-ADMIN_USER_ID = 7670571581  # تم تحديث ID الأدمن
+# تعيين متغيرات البوت من بيئة النظام
+API_ID = os.getenv("API_ID")
+API_HASH = os.getenv("API_HASH")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+ADMIN_USER_ID = int(os.getenv("ADMIN_USER_ID"))  # تحويل ID الأدمن إلى رقم صحيح
 
 bot = Client("payment_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
@@ -184,3 +185,4 @@ def handle_photo(client, message):
 
 
 bot.run()
+
