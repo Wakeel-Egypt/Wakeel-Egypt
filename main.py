@@ -16,11 +16,10 @@ user_data = {}
 def start(client, message):
     user_data[message.chat.id] = {"step": 0}  # بداية من الخطوة الأولى
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("💰 إيداع", callback_data="deposit")],
-        [InlineKeyboardButton("💸 سحب", callback_data="withdraw")]
+        [InlineKeyboardButton(" إيداع ", callback_data="deposit")],
+        [InlineKeyboardButton(" سحب ", callback_data="withdraw")]
     ])
-    message.reply("مرحبا بك في Wakeel Egypt. وكيلك الإلكتروني الأول في مصر. ما الخدمة التي تريدها؟\n\n"
-                  "*يرجى اختيار إحدى الخيارات:*",
+    message.reply("مرحبا بك في Wakeel Egypt. وكيلك الإلكتروني الأول في مصر. ما الخدمة التي تريدها؟\n\n",
                   reply_markup=keyboard)
 
 @bot.on_callback_query()
@@ -33,11 +32,11 @@ def handle_callback(client, callback_query):
         user_data[chat_id]["transaction_type"] = data
         user_data[chat_id]["step"] = 1  # تحديد أن العميل في خطوة اختيار البرنامج
         keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("🎲 1xBet", callback_data="1xbet")],
-            [InlineKeyboardButton("🏆 Melbet", callback_data="melbet")],
-            [InlineKeyboardButton("💻 Linebet", callback_data="linebet")]
+            [InlineKeyboardButton(" 1xBet ", callback_data="1xbet")],
+            [InlineKeyboardButton(" Melbet ", callback_data="melbet")],
+            [InlineKeyboardButton(" Linebet ", callback_data="linebet")]
         ])
-        callback_query.message.reply("برجاء اختيار البرنامج:", reply_markup=keyboard)
+        callback_query.message.reply("برجاء اختيار البرنامج :", reply_markup=keyboard)
 
     elif data in ["1xbet", "melbet", "linebet"]:
         user_data[chat_id]["platform"] = data
@@ -47,28 +46,28 @@ def handle_callback(client, callback_query):
     elif data in ["wallet", "instapay"]:
         user_data[chat_id]["payment_method"] = data
         user_data[chat_id]["step"] = 3  # تحديد أن العميل في خطوة إدخال المبلغ
-        callback_query.message.reply("أكتب المبلغ المراد إيداعه أو سحبه.")
+        callback_query.message.reply("أدخل المبلغ .")
     
     # الرجوع إلى الخطوة السابقة
     elif data == "back":
         step = user_data[chat_id].get("step", 0)
         if step == 1:
             keyboard = InlineKeyboardMarkup([
-                [InlineKeyboardButton("💰 إيداع", callback_data="deposit")],
-                [InlineKeyboardButton("💸 سحب", callback_data="withdraw")]
+                [InlineKeyboardButton(" إيداع ", callback_data="deposit")],
+                [InlineKeyboardButton(" سحب ", callback_data="withdraw")]
             ])
             callback_query.message.reply("ما الخدمة التي تريدها؟", reply_markup=keyboard)
         elif step == 2:
             keyboard = InlineKeyboardMarkup([
-                [InlineKeyboardButton("🎲 1xBet", callback_data="1xbet")],
-                [InlineKeyboardButton("🏆 Melbet", callback_data="melbet")],
-                [InlineKeyboardButton("💻 Linebet", callback_data="linebet")]
+                [InlineKeyboardButton(" 1xBet ", callback_data="1xbet")],
+                [InlineKeyboardButton(" Melbet ", callback_data="melbet")],
+                [InlineKeyboardButton(" Linebet ", callback_data="linebet")]
             ])
-            callback_query.message.reply("برجاء اختيار البرنامج:", reply_markup=keyboard)
+            callback_query.message.reply("برجاء اختيار البرنامج :", reply_markup=keyboard)
         elif step == 3:
             payment_keyboard = InlineKeyboardMarkup([
-                [InlineKeyboardButton("💳 محفظة إلكترونية", callback_data="wallet")],
-                [InlineKeyboardButton("💵 إنستاباي", callback_data="instapay")]
+                [InlineKeyboardButton(" محفظة إلكترونية ", callback_data="wallet")],
+                [InlineKeyboardButton(" إنستاباي ", callback_data="instapay")]
             ])
             callback_query.message.reply("برجاء اختيار طريقة الدفع:", reply_markup=payment_keyboard)
         user_data[chat_id]["step"] -= 1  # العودة خطوة واحدة للخلف
@@ -91,8 +90,8 @@ def handle_text(client, message):
         message.reply("برجاء اختيار طريقة الدفع.")
         
         payment_keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("💳 محفظة إلكترونية", callback_data="wallet")],
-            [InlineKeyboardButton("💵 إنستاباي", callback_data="instapay")]
+            [InlineKeyboardButton(" محفظة إلكترونية ", callback_data="wallet")],
+            [InlineKeyboardButton(" إنستاباي ", callback_data="instapay")]
         ])
         message.reply("برجاء اختيار طريقة الدفع:", reply_markup=payment_keyboard)
         
@@ -110,9 +109,6 @@ def handle_text(client, message):
             msg = f"قم بسحب مبلغ {message.text} على {'عنوان السحب' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل كود السحب."
         message.reply(msg)
         
-        # إرسال البيانات إلى الأدمن
-        user_info = f"طلب جديد:\nالعملية: {transaction_type}\nالبرنامج: {user_data[chat_id]['platform']}\nID الحساب: {user_data[chat_id]['id']}\nطريقة الدفع: {payment_method}\nالمبلغ: {message.text}"
-        bot.send_message(ADMIN_USER_ID, user_info)
 
 @bot.on_message(filters.photo)
 def handle_photo(client, message):
@@ -120,10 +116,18 @@ def handle_photo(client, message):
     if chat_id in user_data and user_data[chat_id].get("transaction_type") == "deposit":
         message.reply("برجاء الإنتظار .. جاري معالجة طلبك.")
 
+# إرسال البيانات إلى الأدمن
+        user_info = f"طلب جديد:\nالعملية: {transaction_type}\nالبرنامج: {user_data[chat_id]['platform']}\nID الحساب: {user_data[chat_id]['id']}\nطريقة الدفع: {payment_method}\nالمبلغ: {message.text}"
+        bot.send_message(ADMIN_USER_ID, user_info)
+
 @bot.on_message(filters.text)
 def handle_code(client, message):
     chat_id = message.chat.id
     if chat_id in user_data and user_data[chat_id].get("transaction_type") == "withdraw":
         message.reply("برجاء الإنتظار .. جاري معالجة طلبك.")
+
+# إرسال البيانات إلى الأدمن
+        user_info = f"طلب جديد:\nالعملية: {transaction_type}\nالبرنامج: {user_data[chat_id]['platform']}\nID الحساب: {user_data[chat_id]['id']}\nطريقة الدفع: {payment_method}\nالمبلغ: {message.text}"
+        bot.send_message(ADMIN_USER_ID, user_info)
 
 bot.run()
