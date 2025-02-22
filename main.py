@@ -145,6 +145,27 @@ def handle_photo(client, message):
 
         # تعيين حالة العميل إلى "تم الإرسال"
         user_data[chat_id]["step"] = 0  # إيقاف إرسال أي رسائل أخرى
+    
+    # إذا كانت الصورة خاصة بالسحب، يتم إرسال جميع البيانات للأدمن
+    elif user_data[chat_id].get("transaction_type") == "withdraw":
+        # إرسال البيانات إلى الأدمن بعد وصول الصورة
+        user_info = f"طلب سحب جديد:\nالعملية: {user_data[chat_id]['transaction_type']}\nالبرنامج: {user_data[chat_id]['platform']}\nID الحساب: {user_data[chat_id]['id']}\nطريقة الدفع: {user_data[chat_id]['payment_method']}\nالمبلغ: {user_data[chat_id]['amount']}"
+        
+        # إضافة رقم المحفظة أو عنوان إنستاباي للسحب
+        if user_data[chat_id]["payment_method"] == "wallet":
+            user_info += f"\nرقم المحفظة للاستلام: {user_data[chat_id]['wallet_or_insta']}"
+        elif user_data[chat_id]["payment_method"] == "instapay":
+            user_info += f"\nعنوان إنستاباي للاستلام: {user_data[chat_id]['wallet_or_insta']}"
+
+        # إرسال الصورة للأدمن أيضًا
+        bot.send_message(ADMIN_USER_ID, user_info)
+        bot.send_photo(ADMIN_USER_ID, message.photo.file_id)
+
+        # إيقاف التفاعل مع العميل بعد إرسال طلبه
+        message.reply("تم إرسال طلبك بنجاح. سيتم متابعة المعاملة.")
+
+        # تعيين حالة العميل إلى "تم الإرسال"
+        user_data[chat_id]["step"] = 0  # إيقاف إرسال أي رسائل أخرى
 
 
 bot.run()
