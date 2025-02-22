@@ -46,7 +46,7 @@ def handle_callback(client, callback_query):
     elif data in ["wallet", "instapay"]:
         user_data[chat_id]["payment_method"] = data
         user_data[chat_id]["step"] = 3  # تحديد أن العميل في خطوة إدخال البيانات الإضافية (رقم المحفظة أو عنوان إنستاباي)
-        callback_query.message.reply("برجاء إدخال رقم المحفظة المرسل منها/الاستلام أو عنوان إنستاباي المرسل منه/الاستلام:")
+        callback_query.message.reply("برجاء إدخال رقم المحفظة المرسل منها/إليها \nأو عنوان إنستاباي المرسل منه/إليه:")
 
     elif data == "back":
         step = user_data[chat_id].get("step", 0)
@@ -162,7 +162,7 @@ def handle_photo(client, message):
         bot.send_photo(ADMIN_USER_ID, message.photo.file_id)
 
         # إيقاف التفاعل مع العميل بعد إرسال طلبه
-        message.reply("تم إرسال طلبك بنجاح. سيتم متابعة المعاملة.")
+        message.reply("تم إرسال طلبك بنجاح .")
 
         # تعيين حالة العميل إلى "تم الإرسال"
         user_data[chat_id]["step"] = 0  # إيقاف إرسال أي رسائل أخرى
