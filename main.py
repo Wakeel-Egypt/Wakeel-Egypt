@@ -115,8 +115,12 @@ def handle_photo(client, message):
     if chat_id in user_data and user_data[chat_id].get("transaction_type") == "deposit":
         message.reply("برجاء الإنتظار .. جاري معالجة طلبك.")
     else:
-# إرسال البيانات إلى الأدمن
-        user_info = f"طلب جديد:\nالعملية: {transaction_type}\nالبرنامج: {user_data[chat_id]['platform']}\nID الحساب: {user_data[chat_id]['id']}\nطريقة الدفع: {payment_method}\nالمبلغ: {message.text}"
+        # تحقق إذا كانت الرسالة صورة فقط
+        if not message.photo:
+            message.reply("يرجى إرسال صورة فقط (سكرين شوت).")
+            return
+        # إرسال البيانات إلى الأدمن
+        user_info = f"طلب جديد:\nالعملية: {user_data[chat_id]['transaction_type']}\nالبرنامج: {user_data[chat_id]['platform']}\nID الحساب: {user_data[chat_id]['id']}\nطريقة الدفع: {user_data[chat_id]['payment_method']}\nالمبلغ: {user_data[chat_id]['amount']}"
         bot.send_message(ADMIN_USER_ID, user_info)
 
 @bot.on_message(filters.text)
@@ -124,9 +128,5 @@ def handle_code(client, message):
     chat_id = message.chat.id
     if chat_id in user_data and user_data[chat_id].get("transaction_type") == "withdraw":
         message.reply("برجاء الإنتظار .. جاري معالجة طلبك.")
-    else:
-# إرسال البيانات إلى الأدمن
-        user_info = f"طلب جديد:\nالعملية: {transaction_type}\nالبرنامج: {user_data[chat_id]['platform']}\nID الحساب: {user_data[chat_id]['id']}\nطريقة الدفع: {payment_method}\nالمبلغ: {message.text}"
-        bot.send_message(ADMIN_USER_ID, user_info)
-
+    
 bot.run()
