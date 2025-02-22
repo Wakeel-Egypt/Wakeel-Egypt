@@ -14,10 +14,10 @@ user_data = {}
 
 @bot.on_message(filters.command("start"))
 def start(client, message):
-    user_data[message.chat.id] = {}
+    user_data[message.chat.id] = {"step": 0}  # بداية من الخطوة الأولى
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("💰 إيداع (نقل الأموال إلى حسابك)", callback_data="deposit")],
-        [InlineKeyboardButton("💸 سحب (سحب الأموال إلى حسابك)", callback_data="withdraw")]
+        [InlineKeyboardButton("💰 إيداع", callback_data="deposit")],
+        [InlineKeyboardButton("💸 سحب", callback_data="withdraw")]
     ])
     message.reply("مرحبا بك في Wakeel Egypt. وكيلك الإلكتروني الأول في مصر. ما الخدمة التي تريدها؟\n\n"
                   "*يرجى اختيار إحدى الخيارات:*",
@@ -27,27 +27,51 @@ def start(client, message):
 def handle_callback(client, callback_query):
     chat_id = callback_query.message.chat.id
     data = callback_query.data
-    
+
+    # تحديد ما إذا كان العميل في خطوة الإيداع أو السحب
     if data == "deposit" or data == "withdraw":
         user_data[chat_id]["transaction_type"] = data
+        user_data[chat_id]["step"] = 1  # تحديد أن العميل في خطوة اختيار البرنامج
         keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton("🎲 1xBet", callback_data="1xbet")],
             [InlineKeyboardButton("🏆 Melbet", callback_data="melbet")],
             [InlineKeyboardButton("💻 Linebet", callback_data="linebet")]
         ])
-        callback_query.message.edit("برجاء اختيار البرنامج:", reply_markup=keyboard)
-    
+        callback_query.message.reply("برجاء اختيار البرنامج:", reply_markup=keyboard)
+
     elif data in ["1xbet", "melbet", "linebet"]:
         user_data[chat_id]["platform"] = data
-        callback_query.message.edit("أكتب الID الخاص بحسابك.")
+        user_data[chat_id]["step"] = 2  # تحديد أن العميل في خطوة إدخال الID
+        callback_query.message.reply("أكتب الID الخاص بحسابك.")
 
     elif data in ["wallet", "instapay"]:
         user_data[chat_id]["payment_method"] = data
-        transaction_type = user_data[chat_id]["transaction_type"]
-        if transaction_type == "deposit":
-            callback_query.message.edit("أكتب المبلغ المراد إيداعه.")
-        else:
-            callback_query.message.edit("أكتب المبلغ المراد سحبه.")
+        user_data[chat_id]["step"] = 3  # تحديد أن العميل في خطوة إدخال المبلغ
+        callback_query.message.reply("أكتب المبلغ المراد إيداعه أو سحبه.")
+    
+    # الرجوع إلى الخطوة السابقة
+    elif data == "back":
+        step = user_data[chat_id].get("step", 0)
+        if step == 1:
+            keyboard = InlineKeyboardMarkup([
+                [InlineKeyboardButton("💰 إيداع", callback_data="deposit")],
+                [InlineKeyboardButton("💸 سحب", callback_data="withdraw")]
+            ])
+            callback_query.message.reply("ما الخدمة التي تريدها؟", reply_markup=keyboard)
+        elif step == 2:
+            keyboard = InlineKeyboardMarkup([
+                [InlineKeyboardButton("🎲 1xBet", callback_data="1xbet")],
+                [InlineKeyboardButton("🏆 Melbet", callback_data="melbet")],
+                [InlineKeyboardButton("💻 Linebet", callback_data="linebet")]
+            ])
+            callback_query.message.reply("برجاء اختيار البرنامج:", reply_markup=keyboard)
+        elif step == 3:
+            payment_keyboard = InlineKeyboardMarkup([
+                [InlineKeyboardButton("💳 محفظة إلكترونية", callback_data="wallet")],
+                [InlineKeyboardButton("💵 إنستاباي", callback_data="instapay")]
+            ])
+            callback_query.message.reply("برجاء اختيار طريقة الدفع:", reply_markup=payment_keyboard)
+        user_data[chat_id]["step"] -= 1  # العودة خطوة واحدة للخلف
 
 @bot.on_message(filters.text)
 def handle_text(client, message):
@@ -55,23 +79,18 @@ def handle_text(client, message):
     if chat_id not in user_data:
         return
 
-    # المرحلة الأولى - اختيار البرنامج
-    if "platform" not in user_data[chat_id]:
-        user_data[chat_id]["platform"] = message.text
-        keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("💳 محفظة إلكترونية", callback_data="wallet")],
-            [InlineKeyboardButton("💵 إنستاباي", callback_data="instapay")]
-        ])
-        message.reply("برجاء اختيار طريقة الدفع:", reply_markup=keyboard)
-
-    # المرحلة الثانية - اختيار طريقة الدفع
-    elif "payment_method" not in user_data[chat_id]:
-        user_data[chat_id]["id"] = message.text
-        message.reply("برجاء اختيار طريقة الدفع.")
+    # التعامل مع المدخلات من المستخدم
+    step = user_data[chat_id]["step"]
     
-    # المرحلة الثالثة - إدخال المبلغ
-    elif "amount" not in user_data[chat_id]:
-        # التحقق من أن المدخل هو رقم فقط
+    if step == 2:  # إدخال الID
+        if not message.text.isdigit():
+            message.reply("رقم الحساب خطأ. يرجى إدخال ID الحساب كرقم.")
+            return
+        user_data[chat_id]["id"] = message.text
+        user_data[chat_id]["step"] = 3
+        message.reply("برجاء اختيار طريقة الدفع.")
+        
+    elif step == 3:  # إدخال المبلغ
         if not message.text.isdigit():
             message.reply("يرجى إدخال مبلغ صحيح (رقم فقط).")
             return
@@ -79,7 +98,6 @@ def handle_text(client, message):
         transaction_type = user_data[chat_id]["transaction_type"]
         payment_method = user_data[chat_id]["payment_method"]
         
-        # تحديد الرسالة حسب نوع العملية وطريقة الدفع
         if transaction_type == "deposit":
             msg = f"قم بتحويل مبلغ {message.text} على {'رقم المحفظة' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل سكرين شوت بالتحويل."
         else:
