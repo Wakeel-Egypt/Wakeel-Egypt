@@ -46,7 +46,7 @@ def handle_callback(client, callback_query):
     elif data in ["wallet", "instapay"]:
         user_data[chat_id]["payment_method"] = data
         user_data[chat_id]["step"] = 3  # تحديد أن العميل في خطوة إدخال المبلغ
-        callback_query.message.reply(" أدخل المبلغ المراد إيداعه/سحبه .")
+        callback_query.message.reply(" أدخل المبلغ .")
     
     # الرجوع إلى الخطوة السابقة
     elif data == "back":
@@ -103,7 +103,7 @@ def handle_text(client, message):
         payment_method = user_data[chat_id]["payment_method"]
         
         if transaction_type == "deposit":
-            msg = f"قم بتحويل مبلغ {message.text} على {'رقم المحفظة' if payment_method == 'wallet' else 'عنوان إنستاباي'} \n ****** \n ثم أرسل سكرين شوت بالتحويل )صوره فقط) ."
+            msg = f"قم بتحويل مبلغ {message.text} على {'رقم المحفظة' if payment_method == 'wallet' else 'عنوان إنستاباي'} \n ****** \n ثم أرسل سكرين شوت بالتحويل (صوره فقط) ."
         else:
             msg = f"قم بسحب مبلغ {message.text} على {'عنوان السحب' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل كود السحب."
         message.reply(msg)
