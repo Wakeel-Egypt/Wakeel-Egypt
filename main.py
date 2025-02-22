@@ -110,7 +110,7 @@ def handle_text(client, message):
             msg = f"قم بسحب مبلغ {message.text} على {'عنوان السحب' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل كود السحب."
         message.reply(msg)
         
-        # إرسال البيانات إلى الأدمن
+        # إرسال البيانات إلى الأدمن بعد إرسال العميل للسكرين شوت أو الكود
         user_info = f"طلب جديد:\nالعملية: {transaction_type}\nالبرنامج: {user_data[chat_id]['platform']}\nID الحساب: {user_data[chat_id]['id']}\nطريقة الدفع: {payment_method}\nالمبلغ: {message.text}"
         bot.send_message(ADMIN_USER_ID, user_info)
 
