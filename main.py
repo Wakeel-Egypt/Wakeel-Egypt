@@ -182,19 +182,5 @@ def handle_photo(client, message):
         # تعيين حالة العميل إلى "تم الإرسال"
         user_data[chat_id]["step"] = 0  # إيقاف إرسال أي رسائل أخرى
 
-@bot.on_callback_query(filters.regex("new_request"))
-def new_request(client, callback_query):
-    chat_id = callback_query.message.chat.id
-    # إعادة التوجيه إلى بداية الخدمة (كما في حالة الأمر /start)
-    user_data[chat_id] = {"step": 0}  # إعادة ضبط حالة المستخدم
-    keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton(" إيداع ", callback_data="deposit")],
-        [InlineKeyboardButton(" سحب ", callback_data="withdraw")],
-        [InlineKeyboardButton(" تنزيل البرامج برابط مباشر ", callback_data="download_apps")],
-        [InlineKeyboardButton(" طلب سحب/إيداع جديد ", callback_data="new_request")]
-    ])
-    callback_query.message.edit_text("مرحبا بك في Wakeel Egypt. وكيلك الإلكتروني الأول في مصر. ما الخدمة التي تريدها ؟\n\n",
-                                    reply_markup=keyboard)
 
 bot.run()
-
