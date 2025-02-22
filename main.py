@@ -20,7 +20,7 @@ def start(client, message):
         [InlineKeyboardButton(" إيداع ", callback_data="deposit")],
         [InlineKeyboardButton(" سحب ", callback_data="withdraw")]
     ])
-    message.reply("مرحبا بك في Wakeel Egypt. وكيلك الإلكتروني الأول في مصر. ما الخدمة التي تريدها؟\n\n",
+    message.reply("مرحبا بك في Wakeel Egypt. وكيلك الإلكتروني الأول في مصر. ما الخدمة التي تريدها ؟\n\n",
                   reply_markup=keyboard)
 
 @bot.on_callback_query()
@@ -41,7 +41,7 @@ def handle_callback(client, callback_query):
     elif data in ["1xbet", "melbet", "linebet"]:
         user_data[chat_id]["platform"] = data
         user_data[chat_id]["step"] = 2  # تحديد أن العميل في خطوة إدخال الID
-        callback_query.message.reply("أكتب الID الخاص بحسابك (أرقام فقط) .")
+        callback_query.message.reply("أكتب الID الخاص بحسابك ( أرقام فقط ) .")
 
     elif data in ["wallet", "instapay"]:
         user_data[chat_id]["payment_method"] = data
@@ -51,14 +51,14 @@ def handle_callback(client, callback_query):
         transaction_type = user_data[chat_id]["transaction_type"]
         if transaction_type == "deposit":
             if data == "wallet":
-                callback_query.message.reply("برجاء إدخال رقم المحفظة المرسل منها:")
+                callback_query.message.reply("برجاء إدخال رقم المحفظة المرسل منها :")
             elif data == "instapay":
-                callback_query.message.reply("برجاء إدخال عنوان إنستاباي المحول منه:")
+                callback_query.message.reply("برجاء إدخال عنوان إنستاباي المحول منه :")
         elif transaction_type == "withdraw":
             if data == "wallet":
-                callback_query.message.reply("برجاء إدخال رقم المحفظة المحول إليها:")
+                callback_query.message.reply("برجاء إدخال رقم المحفظة المحول إليها :")
             elif data == "instapay":
-                callback_query.message.reply("برجاء إدخال عنوان إنستاباي المحول إليه:")
+                callback_query.message.reply("برجاء إدخال عنوان إنستاباي المحول إليه :")
 
 @bot.on_message(filters.text)
 def handle_text(client, message):
@@ -70,7 +70,7 @@ def handle_text(client, message):
     
     if step == 2:  # إدخال الID
         if not message.text.isdigit():
-            message.reply("رقم الحساب خطأ. يرجى إدخال ID الحساب كرقم.")
+            message.reply("رقم الحساب خطأ. يرجى إدخال ID الحساب كرقم .")
             return
         user_data[chat_id]["id"] = message.text
         user_data[chat_id]["step"] = 3
@@ -88,17 +88,17 @@ def handle_text(client, message):
         # التحقق من صحة المدخلات
         if payment_method == "wallet":  # المحفظة الإلكترونية
             if not entered_value.isdigit():
-                message.reply("خطأ: رقم المحفظة يجب أن يحتوي على أرقام فقط.")
+                message.reply("خطأ : رقم المحفظة يجب أن يحتوي على أرقام فقط .")
                 return
         elif payment_method == "instapay":  # إنستاباي
             if not entered_value.isalnum():
-                message.reply("خطأ: عنوان إنستاباي يجب أن يحتوي على حروف أو أرقام فقط (لا يمكن إدخال صور).")
+                message.reply("خطأ: عنوان إنستاباي يجب أن يحتوي على حروف أو أرقام فقط ( لا يمكن إدخال صور ) .")
                 return
         
         user_data[chat_id]["wallet_or_insta"] = entered_value
         user_data[chat_id]["step"] = 4  # الانتقال إلى خطوة إدخال المبلغ
         
-        message.reply("أدخل المبلغ:")
+        message.reply("أدخل المبلغ :")
 
     elif step == 4:  # إدخال المبلغ
         if not message.text.isdigit():
@@ -164,7 +164,7 @@ def handle_photo(client, message):
         bot.send_photo(ADMIN_USER_ID, message.photo.file_id)
 
         # إيقاف التفاعل مع العميل بعد إرسال طلبه
-        message.reply("تم إرسال طلبك بنجاح. سيتم متابعة المعاملة.")
+        message.reply("تم إرسال طلبك بنجاح. سيتم متابعة المعاملة .")
 
         # تعيين حالة العميل إلى "تم الإرسال"
         user_data[chat_id]["step"] = 0  # إيقاف إرسال أي رسائل أخرى
