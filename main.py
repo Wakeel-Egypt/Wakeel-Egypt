@@ -1,5 +1,5 @@
 from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 # تعيين متغيرات البوت
 API_ID = "20267178"
@@ -89,6 +89,12 @@ def handle_text(client, message):
         user_data[chat_id]["id"] = message.text
         user_data[chat_id]["step"] = 3
         message.reply("برجاء اختيار طريقة الدفع.")
+        
+        payment_keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("💳 محفظة إلكترونية", callback_data="wallet")],
+            [InlineKeyboardButton("💵 إنستاباي", callback_data="instapay")]
+        ])
+        message.reply("برجاء اختيار طريقة الدفع:", reply_markup=payment_keyboard)
         
     elif step == 3:  # إدخال المبلغ
         if not message.text.isdigit():
