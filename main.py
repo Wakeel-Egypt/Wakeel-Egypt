@@ -94,7 +94,7 @@ def handle_text(client, message):
         
     elif step == 3:  # إدخال المبلغ
         if not message.text.isdigit():
-            message.reply("يرجى إدخال مبلغ صحيح (رقم فقط).")
+            message.reply("يرجى إدخال قيمة صحيحة .")
             return
         user_data[chat_id]["amount"] = message.text
         transaction_type = user_data[chat_id]["transaction_type"]
