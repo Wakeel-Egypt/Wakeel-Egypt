@@ -42,26 +42,15 @@ def handle_callback(client, callback_query):
     elif data == "download_apps":
         # إضافة أزرار البرامج التي يمكن تنزيلها
         keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("1xBet", callback_data="download_1xbet")],
-            [InlineKeyboardButton("Melbet", callback_data="download_melbet")],
-            [InlineKeyboardButton("Linebet", callback_data="download_linebet")],
-            [InlineKeyboardButton("888StarZ", callback_data="download_888starz")],
-            [InlineKeyboardButton("Megapari", callback_data="download_megapari")]
+            [InlineKeyboardButton("1xBet", url="https://www.example.com/1xbet")],
+            [InlineKeyboardButton("Melbet", url="https://www.example.com/melbet")],
+            [InlineKeyboardButton("Linebet", url="https://www.example.com/linebet")],
+            [InlineKeyboardButton("888StarZ", url="https://www.example.com/888starz")],
+            [InlineKeyboardButton("Megapari", url="https://www.example.com/megapari")]
         ])
         callback_query.message.reply("اختيار البرنامج الذي تريد تنزيله:", reply_markup=keyboard)
 
-    elif data == "download_1xbet":
-        callback_query.message.reply("رابط تحميل 1xBet: [رابط 1xBet](https://www.example.com/1xbet)")
-    elif data == "download_melbet":
-        callback_query.message.reply("رابط تحميل Melbet: [رابط Melbet](https://www.example.com/melbet)")
-    elif data == "download_linebet":
-        callback_query.message.reply("رابط تحميل Linebet: [رابط Linebet](https://www.example.com/linebet)")
-    elif data == "download_888starz":
-        callback_query.message.reply("رابط تحميل 888StarZ: [رابط 888StarZ](https://www.example.com/888starz)")
-    elif data == "download_megapari":
-        callback_query.message.reply("رابط تحميل Megapari: [رابط Megapari](https://www.example.com/megapari)")
-
-    # باقي العمليات للـ deposit و withdraw
+    # التعامل مع باقي البيانات الخاصة بالعمليات المالية
     elif data in ["1xbet", "melbet", "linebet"]:
         user_data[chat_id]["platform"] = data
         user_data[chat_id]["step"] = 2  # تحديد أن العميل في خطوة إدخال الID
