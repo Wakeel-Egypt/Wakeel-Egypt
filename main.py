@@ -110,6 +110,10 @@ def handle_text(client, message):
 def handle_photo(client, message):
     chat_id = message.chat.id
     if chat_id not in user_data:
+
+    else:
+        message.reply("يرجى إرسال صورة فقط (سكرين شوت).")
+        
         return
     
     if user_data[chat_id].get("transaction_type") == "deposit":
@@ -123,8 +127,7 @@ def handle_photo(client, message):
         # تعيين حالة العميل إلى "تم الإرسال"
         user_data[chat_id]["step"] = 0  # إيقاف إرسال أي رسائل أخرى
 
-    else:
-        message.reply("يرجى إرسال صورة فقط (سكرين شوت).")
+    
 
 bot.run()
 
