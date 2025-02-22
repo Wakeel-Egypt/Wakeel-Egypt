@@ -38,23 +38,7 @@ def handle_callback(client, callback_query):
 
     elif data in ["1xbet", "melbet", "linebet"]:
         user_data[chat_id]["platform"] = data
-        keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("محفظة إلكترونية", callback_data="wallet"),
-             InlineKeyboardButton("إنستاباي", callback_data="instapay")],
-            [InlineKeyboardButton("رجوع", callback_data="back_to_transaction_type")]
-        ])
-        bot.send_message(chat_id, "أكتب الID الخاص بحسابك.", reply_markup=keyboard)
-    
-    elif data in ["wallet", "instapay"]:
-        user_data[chat_id]["payment_method"] = data
-        transaction_type = user_data[chat_id]["transaction_type"]
-        keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("رجوع", callback_data="back_to_platform")]
-        ])
-        if transaction_type == "deposit":
-            bot.send_message(chat_id, "أدخل المبلغ المراد إيداعه.", reply_markup=keyboard)
-        else:
-            bot.send_message(chat_id, "أدخل المبلغ المراد سحبه.", reply_markup=keyboard)
+        bot.send_message(chat_id, "أكتب الID الخاص بحسابك.", reply_markup=None)
 
     elif data == "back_to_service":
         del user_data[chat_id]["transaction_type"]
@@ -64,7 +48,7 @@ def handle_callback(client, callback_query):
         ])
         bot.send_message(chat_id, "برجاء اختيار الخدمة مرة أخرى.", reply_markup=keyboard)
 
-    elif data == "back_to_transaction_type":
+    elif data == "back_to_platform":
         del user_data[chat_id]["platform"]
         keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton("1xBet", callback_data="1xbet"),
@@ -74,14 +58,21 @@ def handle_callback(client, callback_query):
         ])
         bot.send_message(chat_id, "برجاء اختيار البرنامج مرة أخرى.", reply_markup=keyboard)
 
-    elif data == "back_to_platform":
+    elif data == "back_to_payment_method":
         del user_data[chat_id]["payment_method"]
-        keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("محفظة إلكترونية", callback_data="wallet"),
-             InlineKeyboardButton("إنستاباي", callback_data="instapay")],
-            [InlineKeyboardButton("رجوع", callback_data="back_to_transaction_type")]
-        ])
-        bot.send_message(chat_id, "برجاء اختيار طريقة الدفع مرة أخرى.", reply_markup=keyboard)
+        transaction_type = user_data[chat_id]["transaction_type"]
+        if transaction_type == "deposit":
+            bot.send_message(chat_id, "اختر طريقة الدفع.", reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("محفظة إلكترونية", callback_data="wallet"),
+                 InlineKeyboardButton("إنستاباي", callback_data="instapay")],
+                [InlineKeyboardButton("رجوع", callback_data="back_to_platform")]
+            ]))
+        else:
+            bot.send_message(chat_id, "اختر طريقة الاستلام.", reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("محفظة إلكترونية", callback_data="wallet"),
+                 InlineKeyboardButton("إنستاباي", callback_data="instapay")],
+                [InlineKeyboardButton("رجوع", callback_data="back_to_platform")]
+            ]))
 
 @bot.on_message(filters.text)
 def handle_text(client, message):
@@ -89,52 +80,62 @@ def handle_text(client, message):
     if chat_id not in user_data:
         return
 
-    # المرحلة الأولى - اختيار البرنامج
+    # التحقق من المدخلات المسموح بها (أرقام فقط)
+    def validate_numeric_input(input_text, error_message):
+        if not input_text.isdigit():
+            message.reply(error_message)
+            return False
+        return True
+
     if "platform" not in user_data[chat_id]:
         user_data[chat_id]["platform"] = message.text
+        bot.send_message(chat_id, "أكتب الID الخاص بحسابك.")
+
+    elif "id" not in user_data[chat_id]:
+        user_data[chat_id]["id"] = message.text
+        if not validate_numeric_input(message.text, "رقم الحساب خطأ"):
+            return
         keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton("محفظة إلكترونية", callback_data="wallet"),
              InlineKeyboardButton("إنستاباي", callback_data="instapay")],
-            [InlineKeyboardButton("رجوع", callback_data="back_to_transaction_type")]
+            [InlineKeyboardButton("رجوع", callback_data="back_to_platform")]
         ])
-        message.reply("اختر طريقة الدفع.", reply_markup=keyboard)
+        bot.send_message(chat_id, "اختر طريقة الدفع.", reply_markup=keyboard)
 
-    # المرحلة الثانية - اختيار طريقة الدفع
     elif "payment_method" not in user_data[chat_id]:
-        user_data[chat_id]["id"] = message.text
-        message.reply("برجاء اختيار طريقة الدفع.")
-    
-    # المرحلة الثالثة - إدخال المبلغ
+        user_data[chat_id]["payment_method"] = message.text
+        transaction_type = user_data[chat_id]["transaction_type"]
+        if transaction_type == "deposit":
+            if message.text == "1":
+                bot.send_message(chat_id, "برجاء تحويل المبلغ المطلوب علي رقم ***** ثم أذكر المبلغ المراد إيداعه مع إرسال سكرين شوت بالتحويل.")
+            elif message.text == "2":
+                bot.send_message(chat_id, "برجاء تحويل المبلغ المطلوب علي عنوان دفع إنستاباي ***** ثم أكتب المبلغ المراد إيداعه مع إرسال سكرين شوت بالتحويل.")
+        else:
+            if message.text == "1":
+                bot.send_message(chat_id, "أكتب مبلغ السحب.")
+            elif message.text == "2":
+                bot.send_message(chat_id, "أكتب مبلغ السحب.")
+
     elif "amount" not in user_data[chat_id]:
-        # التحقق من أن المدخل هو رقم فقط
-        if not message.text.isdigit():
-            message.reply("يرجى إدخال مبلغ صحيح (رقم فقط).")
+        if not validate_numeric_input(message.text, "المبلغ خطأ"):
             return
         user_data[chat_id]["amount"] = message.text
-        transaction_type = user_data[chat_id]["transaction_type"]
-        payment_method = user_data[chat_id]["payment_method"]
-        
-        # تحديد الرسالة حسب نوع العملية وطريقة الدفع
-        if transaction_type == "deposit":
-            msg = f"قم بتحويل مبلغ {message.text} على {'رقم المحفظة' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل سكرين شوت بالتحويل."
-        else:
-            msg = f"قم بسحب مبلغ {message.text} على {'عنوان السحب' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل كود السحب."
-        message.reply(msg)
-        
-        # إرسال البيانات إلى الأدمن
-        user_info = f"طلب جديد:\nالعملية: {transaction_type}\nالبرنامج: {user_data[chat_id]['platform']}\nID الحساب: {user_data[chat_id]['id']}\nطريقة الدفع: {payment_method}\nالمبلغ: {message.text}"
-        bot.send_message(ADMIN_USER_ID, user_info)
+        bot.send_message(chat_id, "أكتب رقم المحفظه المراد الإستلام عليه.")
+
+    elif "wallet_id" not in user_data[chat_id]:
+        if not validate_numeric_input(message.text, "رقم المحفظه خطأ"):
+            return
+        user_data[chat_id]["wallet_id"] = message.text
+        bot.send_message(chat_id, "أدخل كود السحب من البرنامج.")
+
+    elif "withdraw_code" not in user_data[chat_id]:
+        user_data[chat_id]["withdraw_code"] = message.text
+        bot.send_message(chat_id, "برجاء الإنتظار .. جاري معالجه طلبك.")
 
 @bot.on_message(filters.photo)
 def handle_photo(client, message):
     chat_id = message.chat.id
     if chat_id in user_data and user_data[chat_id].get("transaction_type") == "deposit":
-        message.reply("برجاء الإنتظار .. جارى معالجة طلبك.")
-
-@bot.on_message(filters.text)
-def handle_code(client, message):
-    chat_id = message.chat.id
-    if chat_id in user_data and user_data[chat_id].get("transaction_type") == "withdraw":
-        message.reply("برجاء الإنتظار .. جارى معالجة طلبك.")
+        message.reply("برجاء الإنتظار .. جاري معالجه طلبك.")
 
 bot.run()
