@@ -103,7 +103,7 @@ def handle_text(client, message):
         if transaction_type == "deposit":
             msg = f"قم بتحويل مبلغ {message.text} على {'رقم المحفظة' if payment_method == 'wallet' else 'عنوان إنستاباي'} \n ****** \nثم أرسل سكرين شوت بالتحويل (صورة فقط حتي يتم إستكمال الطلب) ."
         else:
-            msg = f"قم بسحب مبلغ {message.text} على {'عنوان السحب' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل كود السحب."
+            msg = f"قم بسحب مبلغ {message.text} على {'عنوان السحب' if payment_method == 'wallet' else 'عنوان إنستاباي'} \n ****** \nثم أرسل كود السحب."
         message.reply(msg)
 
         # تحديث خطوة العميل بحيث يصبح إرسال الصورة فقط هو المتاح
