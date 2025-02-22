@@ -13,7 +13,7 @@ bot = Client("payment_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKE
 # تخزين بيانات المستخدمين
 user_data = {}
 
-@bot.on_message(filters.command("Start"))
+@bot.on_message(filters.command("start"))
 def start(client, message):
     user_data[message.chat.id] = {"step": 0}  # بداية من الخطوة الأولى
     keyboard = InlineKeyboardMarkup([
