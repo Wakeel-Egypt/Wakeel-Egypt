@@ -82,7 +82,20 @@ def handle_text(client, message):
         message.reply("برجاء اختيار طريقة الدفع :", reply_markup=payment_keyboard)
         
     elif step == 3:  # إدخال البيانات الإضافية (رقم المحفظة أو عنوان إنستاباي)
-        user_data[chat_id]["wallet_or_insta"] = message.text
+        payment_method = user_data[chat_id]["payment_method"]
+        entered_value = message.text
+
+        # التحقق من صحة المدخلات
+        if payment_method == "wallet":  # المحفظة الإلكترونية
+            if not entered_value.isdigit():
+                message.reply("خطأ: رقم المحفظة يجب أن يحتوي على أرقام فقط.")
+                return
+        elif payment_method == "instapay":  # إنستاباي
+            if not entered_value.isalnum():
+                message.reply("خطأ: عنوان إنستاباي يجب أن يحتوي على حروف أو أرقام فقط (لا يمكن إدخال صور).")
+                return
+        
+        user_data[chat_id]["wallet_or_insta"] = entered_value
         user_data[chat_id]["step"] = 4  # الانتقال إلى خطوة إدخال المبلغ
         
         message.reply("أدخل المبلغ:")
@@ -123,7 +136,7 @@ def handle_photo(client, message):
         if user_data[chat_id]["payment_method"] == "wallet":
             user_info += f"\nرقم المحفظة المرسل منها: {user_data[chat_id]['wallet_or_insta']}"
         elif user_data[chat_id]["payment_method"] == "instapay":
-            user_info += f"\nعنوان إنستاباي المرسل منه: {user_data[chat_id]['wallet_or_insta']}"
+            user_info += f"\nعنوان إنستاباي المحول منه: {user_data[chat_id]['wallet_or_insta']}"
 
         # إرسال الصورة للأدمن أيضًا
         bot.send_message(ADMIN_USER_ID, user_info)
