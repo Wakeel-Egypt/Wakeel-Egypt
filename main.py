@@ -103,7 +103,7 @@ def handle_text(client, message):
         payment_method = user_data[chat_id]["payment_method"]
         
         if transaction_type == "deposit":
-            msg = f"قم بتحويل مبلغ {message.text} على {'رقم المحفظة' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل سكرين شوت بالتحويل )صوره فقط)."
+            msg = f"قم بتحويل مبلغ {message.text} على {'رقم المحفظة' if payment_method == 'wallet' else 'عنوان إنستاباي'} \n ****** \n ثم أرسل سكرين شوت بالتحويل )صوره فقط) ."
         else:
             msg = f"قم بسحب مبلغ {message.text} على {'عنوان السحب' if payment_method == 'wallet' else 'عنوان إنستاباي'} ****** ثم أرسل كود السحب."
         message.reply(msg)
